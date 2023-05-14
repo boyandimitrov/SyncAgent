@@ -1,0 +1,182 @@
+- table_name: category
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+- table_name: manufacturer
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+- table_name: brand
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_manufacturer
+      data_type: STRING
+      description: References manufacturer table
+- table_name: market
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+- table_name: product_sales
+  columns:
+    - column_name: product_id
+      data_type: STRING
+    - column_name: product_name
+      data_type: STRING
+    - column_name: brand_name
+      data_type: STRING
+    - column_name: category_name
+      data_type: STRING
+    - column_name: transaction_date
+      data_type: TIMESTAMP
+    - column_name: quantity_sold
+      data_type: INT64
+    - column_name: unit_price
+      data_type: FLOAT64
+    - column_name: total_sales
+      data_type: FLOAT64
+- table_name: productBase
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_brand
+      data_type: STRING
+      description: References brand table
+    - column_name: fk_manufacturer
+      data_type: STRING
+      description: References manufacturer table
+    - column_name: fk_category1
+      data_type: STRING
+      description: References category table
+    - column_name: fk_category2
+      data_type: STRING
+      description: References category table
+    - column_name: fk_category3
+      data_type: STRING
+      description: References category table
+    - column_name: fk_category4
+      data_type: STRING
+      description: References category table
+- table_name: product
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_productBase
+      data_type: STRING
+      description: References productBase table
+- table_name: transaction
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: date
+      data_type: TIMESTAMP
+    - column_name: fk_checkout
+      data_type: STRING
+      description: References checkout table
+    - column_name: sum
+      data_type: FLOAT64
+- table_name: stock
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_product
+      data_type: STRING
+      description: References product table
+    - column_name: fk_store
+      data_type: STRING
+      description: References store table
+    - column_name: fk_shop
+      data_type: STRING
+      description: References shop table
+    - column_name: quantity
+      data_type: INT64
+    - column_name: price
+      data_type: FLOAT64
+- table_name: transaction_detail
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: fk_transaction
+      data_type: STRING
+      description: References transaction table
+    - column_name: fk_distributor
+      data_type: STRING
+      description: References distributor table
+    - column_name: fk_stock
+      data_type: STRING
+      description: References stock table
+    - column_name: fk_promotion
+      data_type: STRING
+    - column_name: quantity
+      data_type: INT64
+    - column_name: single_price
+      data_type: FLOAT64
+    - column_name: single_price_discount
+      data_type: FLOAT64
+    - column_name: total_price
+      data_type: FLOAT64
+    - column_name: total_price_discount
+      data_type: FLOAT64
+- table_name: store
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_distributor
+      data_type: STRING
+      description: References distributor table
+- table_name: shop
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_market
+      data_type: STRING
+      description: References market table
+- table_name: package
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+- table_name: checkout
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+    - column_name: fk_shop
+      data_type: STRING
+      description: References shop table
+- table_name: distributor
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: name
+      data_type: STRING
+- table_name: b_product_packaging
+  columns:
+    - column_name: id
+      data_type: STRING
+    - column_name: fk_product
+      data_type: STRING
+      description: References product table
+    - column_name: fk_package
+      data_type: STRING
+      description: References package table
