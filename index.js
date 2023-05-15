@@ -1,46 +1,23 @@
 require('dotenv').config();
 
-const { Client } = require('@elastic/elasticsearch');
-const cron = require('node-cron');
 const bq = require('./src/bq');
+const {synchronize} = require('./src/sync');
+const mappings = require('./mappings.json');
 
-
-const USERS = "users";
-
-const esClient = new Client({
-    node: process.env.ELASTICSEARCH_URL,
-});
-
-function parseElasticsearchResponse(response) {
-    return response.body.hits.hits.map(hit => hit._source);
+async function startSync() {
+    for ( const mapping of mappings) {
+        await synchronize(mapping);
+    }
 }
 
-async function syncElasticsearchToBigQuery() {
-    const latestTimestamp = await bq.getLastSyncTimestamp(USERS);
-
-    const esResponse = await esClient.search({
-        index: 'users',
-        body: {
-        query: {
-            range: {
-                timestamp: {
-                    gt: latestTimestamp,
-                },
-            },
-        },
-        },
-    });
-
-    const data = parseElasticsearchResponse(esResponse);
-
-    bq.insertData(USERS, data)
+async function initSync() {
+    await bq.createSchema(mappings);
+    console.log("BQ schema created");
 }
 
-// Schedule the job to run every hour
-cron.schedule('0 * * * *', async function() {
-    console.log('Running sync job');
-    
-    await bq.createTable(USERS);
+initSync()
+    .then(() => startSync())
+    .catch(console.error);
 
-    syncElasticsearchToBigQuery().catch(console.error);
-});
+
+

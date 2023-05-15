@@ -1,0 +1,55 @@
+[
+    {
+        "es" : "users",
+        "bq" : "users",
+        "sync_batch_size" : 2,
+        "id_column" : "id",
+        "sync_column" : "@timestamp",
+        "mapping" : [
+            {
+                "es_column" : "id",
+                "es_type" : "int",
+                "bq_column" : "id",
+                "bq_type" : "STRING",
+                "transfromer" : "int_to_string"
+            },
+            {
+                "es_column" : "name",
+                "es_type" : "string",
+                "bq_column" : "name",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "email",
+                "es_type" : "string",
+                "bq_column" : "email",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "signup_date",
+                "es_type" : "string",
+                "bq_column" : "signup_date",
+                "bq_type" : "DATE",
+                "transformer" : "string_to_date",
+                "fk" : "RESEARCH",
+                "partition_key" : "RESEARCH"
+            },
+            {
+                "es_column" : "total",
+                "es_type" : "int",
+                "bq_column" : "total",
+                "bq_type" : "STRING",
+                "transfromer" : "int_to_string"
+            },
+            {
+                "es_column" : "@timestamp",
+                "es_type" : "string",
+                "bq_column" : "timestamp",
+                "bq_type" : "TIMESTAMP",
+                "transfromer" : "string_to_timestamp"
+            }
+        ]
+    }
+]
+
+

@@ -12,3 +12,40 @@ docker pull docker.elastic.co/kibana/kibana:7.10.1
 docker run --link elasticsearch:elasticsearch -p 5601:5601 -d --name kibana docker.elastic.co/kibana/kibana:7.10.1
 docker rm -f kibana
 
+//ELASTIC queries
+GET users/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET _cat/indices?v&pretty
+
+POST /users/_refresh
+
+
+POST /users/_update_by_query
+{
+  "script": {
+    "source": "ctx._source['timestamp'] = params.timestamp",
+    "lang": "painless",
+    "params": {
+      "timestamp": "2023-05-01T00:00:00Z"
+    }
+  },
+  "query": {
+    "terms": {
+      "id": ["1", "2", "3", "4"]
+    }
+  }
+}
+
+
+POST /users/_update_by_query
+{
+  "script": {
+    "source": "ctx._source['@timestamp'] = ctx._source.signup_date",
+    "lang": "painless"
+  }
+}
