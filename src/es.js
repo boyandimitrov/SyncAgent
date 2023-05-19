@@ -39,7 +39,7 @@ async function search(mapping, latestTimestamp, latestId) {
             size: mapping.sync_batch_size || 5,
             sort: [
                 { [mapping.sync_column]: { order: 'asc' } },
-                { [mapping.id_column]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
+                { [`${mapping.id_column}.keyword`]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
             ],
             query: {
                 bool: {
