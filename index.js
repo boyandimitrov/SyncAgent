@@ -1,13 +1,19 @@
 require('dotenv').config();
 
-const bq = require('./src/bq');
-const {synchronize} = require('./src/sync');
 const mappings = require('./mappings.json');
 
+const bq = require('./src/bq');
+const SyncManager = require('./src/sync');
+
+const syncManager = new SyncManager();
+
 async function startSync() {
-    for ( const mapping of mappings) {
-        await synchronize(mapping);
-    }
+    syncManager.startSync(mappings);
+}
+
+async function updateSync() {
+    const newMappings = mappings;
+    syncManager.startSync(newMappings);
 }
 
 async function initSync() {
