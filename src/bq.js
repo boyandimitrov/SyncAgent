@@ -8,40 +8,108 @@ const bigquery = new BigQuery({
 async function createSchema(mappings) {
     for ( const mapping of mappings) {
         const tableName = mapping.bq;
-        const columns = mapping.mapping.map(({bq_column, bq_type}) => {
-            return {
-                name: bq_column, 
-                type: bq_type,
-            }
-        })
+        // const columns = mapping.mapping.map(({bq_column, bq_type}) => {
+        //     return {
+        //         name: bq_column, 
+        //         type: bq_type,
+        //     }
+        // })
 
-        await createTable(tableName, columns );
+        await createTable(tableName, mapping.mapping );
+
+        const bridges = mapping.bridges || [];
+        for ( const bridge of bridges) {
+            const tableName = bridge.bq;
+    
+            await createTable(tableName, bridge.mapping );
+        }
     }
 }
 
-async function createTable(tableName, schema) {
+// async function createTable(tableName, schema) {
 
+//     const dataset = bigquery.dataset(process.env.BQ_DATASET);
+//     const table = dataset.table(tableName);
+
+//     // Check if the table exists
+//     const [exists] = await table.exists();
+
+//     if (!exists) {
+//         // Only create the table if it does not exist
+//         await table.create({ schema });
+//     }
+//     console.log(`Table ${table.id} created.`);
+// }
+
+async function createTable(tableName, schema) {
     const dataset = bigquery.dataset(process.env.BQ_DATASET);
     const table = dataset.table(tableName);
+
+    // Function to recursively modify the schema to handle object types
+    function flattenSchema(fields) {
+        const modifiedSchema = [];
+        for (const field of fields) {
+            if (field.strategy === 'flat' && field.flatten) {
+                // flatten the object into its properties
+                const nestedFields = flattenSchema(field.flatten);
+                modifiedSchema.push(...nestedFields);
+            } 
+            else if (field.strategy === 'foreign_key_simple' && field.fk) {
+                // flatten the object into its properties
+                const nestedFields = flattenSchema(field.fk);
+                modifiedSchema.push(...nestedFields);
+            } 
+            else if (field.strategy === 'foreign_key_type' && field.fk) {
+                // flatten the object into its properties
+                const nestedFields = flattenSchema(field.fk);
+                modifiedSchema.push(...nestedFields);
+            } 
+            else {
+                if ( field.es_types ) {
+                    field.es_types.forEach(type => {
+                        modifiedSchema.push({
+                            name: field.bq_column + type,
+                            type: field.bq_type,
+                            mode: 'NULLABLE'
+                        });
+                    })
+                }
+                else {
+                    modifiedSchema.push({
+                        name: field.bq_column,
+                        type: field.bq_type,
+                        mode: 'NULLABLE'
+                    });
+    
+                }
+            }
+        }
+        return modifiedSchema;
+    }
+
+    const modifiedSchema = flattenSchema(schema);
 
     // Check if the table exists
     const [exists] = await table.exists();
 
     if (!exists) {
         // Only create the table if it does not exist
-        await table.create({ schema });
+        await table.create({ schema: modifiedSchema });
     }
     console.log(`Table ${table.id} created.`);
 }
 
-async function getLastSyncTimestamp(tableName) {
-    const query = `SELECT MAX(timestamp) as last_sync_timestamp FROM ${process.env.BQ_DATASET}.${tableName}`;
+async function getLastSyncRecord(tableName) {
+    const query = `SELECT id, timestamp FROM ${process.env.BQ_DATASET}.${tableName} ORDER BY timestamp DESC, id DESC LIMIT 1`;
     const options = {
         query: query,
         location: 'US',
     };
     const [rows] = await bigquery.query(options);
-    return rows[0].last_sync_timestamp?.value;
+    if ( rows?.length ) {
+        return {syncId: rows[0].id, syncTimestamp : rows[0].timestamp?.value};
+    }
+    return {syncId: null, syncTimestamp : null};
 }
 
 async function insertRows (tableName, rows) {
@@ -53,5 +121,5 @@ async function insertRows (tableName, rows) {
 }
 
 module.exports = {
-    createSchema, createTable, getLastSyncTimestamp, insertRows
+    createSchema, createTable, getLastSyncRecord, insertRows
 }

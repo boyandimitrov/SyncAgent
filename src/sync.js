@@ -1,5 +1,6 @@
 const es = require('./es');
 const bq = require('./bq');
+const {transformResponse} = require('./mapper');
 const EventEmitter = require('events');
 
 class SyncManager extends EventEmitter {
@@ -9,24 +10,31 @@ class SyncManager extends EventEmitter {
     }
 
     async synchronize(mapping) {
-        let latestTimestamp = await bq.getLastSyncTimestamp(mapping.bq);
-        let latestId = null; // Initialize the latest ID
+        let {syncId, syncTimestamp} = await bq.getLastSyncRecord(mapping.bq);
         
         while (this.shouldContinueSync) {
-            const rows = await es.search(mapping, latestTimestamp, latestId);
+            const hits = await es.search(mapping, syncTimestamp, syncId);
+            const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
+            if (rows?.length > 0) {
+                console.log('insert rows');
+                await bq.insertRows(mapping.bq, rows);
+            }
+
+            if ( bridgeRows ) {
+                for ( const bridge of bridgeRows ) {
+                    await bq.insertRows(bridge, bridgeRows[bridge]);
+                }
+            }
+
             if (rows.length === 0) {
                 console.log('No new data to sync');
-                return latestTimestamp;
+                return syncTimestamp;
             }
-        
-            console.log('insert rows');
-            await bq.insertRows(mapping.bq, rows);
     
             // Remember the timestamp of the last synced document
-            latestTimestamp = rows[rows.length - 1][mapping.sync_column];
-            latestId = rows[rows.length - 1][mapping.id_column];
+            syncTimestamp = hits[hits.length - 1]._source[mapping.sync_column];
+            syncId = hits[hits.length - 1]._source[mapping.sync_id_column];
             console.log(`Synced ${rows.length} rows`);
-            return latestTimestamp;
         }
     }
 
@@ -37,13 +45,17 @@ class SyncManager extends EventEmitter {
         // Define the interval based on the difference
         let interval;
         if (diff < 5 * 60 * 1000) {       // less than 5 minutes
+            console.log('1 second interval')
             interval = 1 * 1000;           // 1 second
         } else if (diff < 24 * 60 * 60 * 1000) {  // less than 24 hours
+            console.log('1 minute interval')
             interval = 60 * 1000;          // 1 minute
         } else {                           // more than 24 hours
+            console.log('1 hour interval')
             interval = 60 * 60 * 1000;     // 1 hour
         }
 
+        console.log('1 second interval reset by should comment code');
         interval = 1 * 1000;
         return interval;
     }
@@ -53,8 +65,9 @@ class SyncManager extends EventEmitter {
             return;
         }
 
-        await this.synchronize(mapping);
-        const interval = this.getSyncInterval(mapping);
+        let latestTimestamp = await this.synchronize(mapping);
+
+        const interval = this.getSyncInterval(latestTimestamp);
         setTimeout(() => this.syncAndSetTimeout(mapping), interval);
     }
 

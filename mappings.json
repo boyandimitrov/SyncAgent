@@ -1,55 +1,101 @@
 [
     {
-        "es" : "users",
-        "bq" : "users",
-        "sync_batch_size" : 2,
-        "id_column" : "id",
+        "es" : "promoto-promotion_v2",
+        "bq" : "promotion",
+        "sync_batch_size" : 100,
+        "id_column" : "id.keyword",
+        "sync_id_column" : "id",
         "sync_column" : "@timestamp",
+        "bridges" : [
+            {
+                "bq" : "promotion_store",
+                "mapping" : [
+                    {
+                        "bq_column" : "id_promotion",
+                        "bq_type" : "STRING"
+                    },
+                    {
+                        "bq_column" : "id_store",
+                        "bq_type" : "STRING"
+                    }
+                ]
+            }       
+        ],
         "mapping" : [
             {
-                "es_column" : "id",
-                "es_type" : "int",
-                "bq_column" : "id",
-                "bq_type" : "STRING",
-                "transfromer" : "int_to_string"
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
             },
             {
-                "es_column" : "name",
-                "es_type" : "string",
-                "bq_column" : "name",
-                "bq_type" : "STRING"
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
             },
             {
-                "es_column" : "email",
-                "es_type" : "string",
-                "bq_column" : "email",
-                "bq_type" : "STRING"
+                "es_column": "name_bg",
+                "es_type": "string",
+                "bq_column": "name_bg",
+                "bq_type": "STRING"
             },
             {
-                "es_column" : "signup_date",
-                "es_type" : "string",
-                "bq_column" : "signup_date",
-                "bq_type" : "DATE",
-                "transformer" : "string_to_date",
-                "fk" : "RESEARCH",
-                "partition_key" : "RESEARCH"
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
             },
             {
-                "es_column" : "total",
-                "es_type" : "int",
-                "bq_column" : "total",
-                "bq_type" : "STRING",
-                "transfromer" : "int_to_string"
+                "es_column" : "owner",
+                "es_type" : "object",
+                "strategy" : "foreign_key_simple",
+                "fk" : [
+                    {
+                        "es_column" : "id",
+                        "es_type" : "string",
+                        "bq_column" : "fk_distributor",
+                        "bq_type" : "string"
+                    }
+                ]
             },
             {
-                "es_column" : "@timestamp",
-                "es_type" : "string",
-                "bq_column" : "timestamp",
-                "bq_type" : "TIMESTAMP",
-                "transfromer" : "string_to_timestamp"
+                "es_column" : "quantity",
+                "es_type" : "object",
+                "strategy" : "flat",
+                "flatten" : [
+                    {
+                        "es_column" : "value",
+                        "es_type" : "int",
+                        "bq_column" : "quantity_value",
+                        "bq_type" : "INT64"
+                    },
+                    {
+                        "es_column" : "dimension",
+                        "es_type" : "string",
+                        "bq_column" : "quantity_dimension",
+                        "bq_type" : "STRING"
+                    }
+                ]
+            },
+            {
+                "es_column" : "store",
+                "es_type" : "object",
+                "strategy" : "foreign_key_bridge",
+                "fk" : [
+                    {
+                        "es_column" : "id",
+                        "es_type" : "string",
+                        "bq_bridge" : "promotion_store",
+                        "bq_primary" : "fk_promotion",
+                        "bq_column" : "fk_store",
+                        "bq_type" : "STRING"
+                    }
+                ]
             }
         ]
     }
+
 ]
 
 

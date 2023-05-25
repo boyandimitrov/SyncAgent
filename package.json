@@ -12,6 +12,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.17.0",
     "@google-cloud/bigquery": "^6.2.0",
+    "big.js": "^6.2.1",
     "dotenv": "^16.0.3"
   },
   "devDependencies": {

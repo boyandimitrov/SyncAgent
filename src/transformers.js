@@ -1,3 +1,5 @@
+const Big = require('big.js');
+
 const transformers = {
     string_to_guid: function(value) {
         // Implement your string to GUID transformation here
@@ -21,6 +23,9 @@ const transformers = {
         // Implement your string to timestamp transformation here
         return value;
     },
+    float_to_numeric: function(value) {
+        return new Big(value).toFixed(2);
+    }
 };
 
 module.exports = {

@@ -20,6 +20,45 @@ GET users/_search
   }
 }
 
+// prepare index
+POST /_reindex
+{
+  "source": {
+    "index": "promoto-shopping_cart_v1"
+  },
+  "dest": {
+    "index": "promoto-shopping_cart_v2"
+  },
+  "script": {
+    "source": """
+      ctx._source.id = ctx._id;
+      ctx._source['@timestamp'] = params.timestamp;
+    """,
+    "lang": "painless",
+    "params": {
+      "timestamp": "2023-05-18T00:00:00Z"
+    }
+  }
+}
+
+
+POST /_reindex
+{
+  "source": {
+    "index": "promoto-product_base_v1"
+  },
+  "dest": {
+    "index": "promoto-product_base_v2"
+  },
+  "script": {
+    "source": """
+      ctx._source.id = ctx._id;
+      ctx._source['@timestamp'] = ctx._source.date_updated != null ? ctx._source.date_updated : ctx._source.date_created;
+    """,
+    "lang": "painless"
+  }
+}
+
 GET _cat/indices?v&pretty
 
 POST /users/_refresh
@@ -47,5 +86,20 @@ POST /users/_update_by_query
   "script": {
     "source": "ctx._source['@timestamp'] = ctx._source.signup_date",
     "lang": "painless"
+  }
+}
+
+
+
+POST /_reindex
+{
+  "source": {
+    "index": "promoto-city_v1"
+  },
+  "dest": {
+    "index": "promoto-city_v2"
+  },
+  "script": {
+    "source": "ctx._source.id = ctx._id"
   }
 }
