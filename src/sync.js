@@ -3,6 +3,9 @@ const bq = require('./bq');
 const {transformResponse} = require('./mapper');
 const EventEmitter = require('events');
 
+const CustomStrategyEmitter = require('./emitter');
+
+const customEmitter = new CustomStrategyEmitter();
 class SyncManager extends EventEmitter {
     constructor() {
         super();
@@ -16,12 +19,14 @@ class SyncManager extends EventEmitter {
             const hits = await es.search(mapping, syncTimestamp, syncId);
             const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
             if (rows?.length > 0) {
-                console.log('insert rows');
+                console.log(`insert rows in ${mapping.bq}`);
                 await bq.insertRows(mapping.bq, rows);
+
+                await customEmitter.emit('rowsUpserted', {table: mapping.bq, rows: rows});
             }
 
-            if ( bridgeRows ) {
-                for ( const bridge of bridgeRows ) {
+            if ( bridgeRows && Object.keys(bridgeRows).length > 0) {
+                for ( const bridge in bridgeRows ) {
                     await bq.insertRows(bridge, bridgeRows[bridge]);
                 }
             }
@@ -34,7 +39,7 @@ class SyncManager extends EventEmitter {
             // Remember the timestamp of the last synced document
             syncTimestamp = hits[hits.length - 1]._source[mapping.sync_column];
             syncId = hits[hits.length - 1]._source[mapping.sync_id_column];
-            console.log(`Synced ${rows.length} rows`);
+            console.log(`Synced ${rows.length} ${mapping.bq} rows`);
         }
     }
 
@@ -74,7 +79,9 @@ class SyncManager extends EventEmitter {
     startSync(mappings) {
         this.shouldContinueSync = true;
         mappings.forEach(mapping => {
-            this.syncAndSetTimeout(mapping);
+            if ( mapping.es !== 'system' ) {
+                this.syncAndSetTimeout(mapping);
+            }
         });
     }
 

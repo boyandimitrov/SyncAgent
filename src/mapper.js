@@ -1,54 +1,160 @@
 const {transformers} = require('./transformers');
 
-function strategyFlatten(obj, field, id) {
-    if ( obj && obj[field.es_column]) {
-        let value = parseObject(obj[field.es_column], field.flatten, id);
-        if (value !== null && typeof value !== 'undefined') {
-            return value;
-        }
-    }
-    else {
+function processField(obj, field, id, callback) {
+    if (obj && obj[field.es_column]) {
+        return callback(obj[field.es_column], field, id);
+    } else {
         console.log(`${id} has missing value for ${field.es_type}`);
+        return null;
     }
+}
 
-    return null;
+// function strategyFlatten(obj, field, id) {
+//     if ( obj && obj[field.es_column]) {
+//         let {value} = parseObject(obj[field.es_column], field.flatten, id);
+//         if (value !== null && typeof value !== 'undefined') {
+//             return value;
+//         }
+//     }
+//     else {
+//         console.log(`${id} has missing value for ${field.es_type}`);
+//     }
+
+//     return null;
+// }
+
+// function strategyForeignKeySimple(obj, field, id) {
+//     if ( obj && obj[field.es_column]) {
+//         let {value} = parseObject(obj[field.es_column], field.fk, id);
+//         if (value !== null && typeof value !== 'undefined') {
+//             return value;
+//         }
+//     }
+//     else {
+//         console.log(`${id} has missing value for ${field.es_type}`);
+
+//     }
+// }
+
+// function strategyForeignKeyType(obj, field, id) {
+//     if ( obj && obj[field.es_column]) {
+//         const fk_obj = obj[field.es_column];
+//         const fk_schema = field.fk[0];
+
+//         const type = fk_obj[fk_schema.es_type_column];
+//         if (!(fk_schema.es_types || []).includes(type)) {
+//             console.error("unsupported type");
+//             return null;
+//         }
+
+//         let value = fk_obj[fk_schema.es_column];
+//         if (value !== null && typeof value !== 'undefined') {
+//             return {[fk_schema.bq_column + type] : value};
+//         }
+//     }
+//     else {
+//         console.log(`${id} has missing value for ${field.es_type}`);
+//     }
+// }
+
+// function strategyForeignKeyBridge(obj, field, id) {
+//     if ( obj && obj[field.es_column]) {
+//         const fk_objs = obj[field.es_column] || [];
+//         const fk_schema = field.fk[0];
+
+//         let bridge_rows = [] ;
+//         fk_objs.forEach(fk_obj => {
+//             bridge_rows.push({
+//                 [fk_schema.bq_primary] : id, 
+//                 [fk_schema.bq_column] : fk_obj[fk_schema.es_column] 
+//             })
+//         })
+//         let bridge = {[fk_schema.bq_bridge] : bridge_rows}
+//         return [{}, bridge];
+//     }
+//     else {
+//         console.log(`${id} has missing value for ${field.es_type}`);
+//         return [{}, null];
+//     }
+// }
+
+// function strategyNormal(obj, field, id) {
+//     try {
+//         let value = obj[field.es_column];
+//         const transformer = field.transformer;
+//         if (transformer && transformers[transformer]) {
+//             value = transformers[transformer](value, field);
+//         }
+//         if ( field.bq_type !== 'CUSTOM') {
+//             return {[field.bq_column] : value};
+//         }
+//         else {
+//             return value;
+//         }
+//     }
+//     catch (e) {
+//         console.error(e);
+//     }
+
+//     return null
+// }
+
+
+function strategyFlatten(obj, field, id) {
+    return processField(obj, field, id, (value, field, id) => {
+        const result = parseObject(obj[field.es_column], field.flatten, id);
+        if (result?.value !== null && typeof result?.value !== 'undefined') {
+            return result.value;
+        }
+    });
 }
 
 function strategyForeignKeySimple(obj, field, id) {
-    if ( obj && obj[field.es_column]) {
-        let value = parseObject(obj[field.es_column], field.fk, id);
-        if (value !== null && typeof value !== 'undefined') {
-            return value;
+    return processField(obj, field, id, (value, field, id) => {
+        const result = parseObject(obj[field.es_column], field.fk, id);
+        if (result?.value !== null && typeof result?.value !== 'undefined') {
+            return result.value;
         }
-    }
-    else {
-        console.log(`${id} has missing value for ${field.es_type}`);
-    }
+    });
 }
 
+
 function strategyForeignKeyType(obj, field, id) {
-    if ( obj && obj[field.es_column]) {
+    return processField(obj, field, id, async (value, field, id) => {
         const fk_obj = obj[field.es_column];
         const fk_schema = field.fk[0];
 
         const type = fk_obj[fk_schema.es_type_column];
+
         if (!(fk_schema.es_types || []).includes(type)) {
             console.error("unsupported type");
             return null;
         }
 
-        let value = fk_obj[fk_schema.es_column];
-        if (value !== null && typeof value !== 'undefined') {
-            return {[fk_schema.bq_column + type] : value};
+        let result = fk_obj[fk_schema.es_column];
+        if (result !== null && typeof result !== 'undefined') {
+            return {[fk_schema.bq_column + type] : result};
         }
-    }
-    else {
-        console.log(`${id} has missing value for ${field.es_type}`);
-    }
+    });
+}
+
+function strategyForeignKeyValueArray(obj, field, id) {
+    return processField(obj, field, id, async (value, field, id) => {
+        const fk_obj = obj[field.es_column];
+        const fk_schema = field.fk[0];
+
+        let result = {};
+        for ( let id of fk_obj ) {
+            if (id !== null && typeof id !== 'undefined') {
+                result[fk_schema.bq_column] = id;
+            }
+        }
+        return result;
+    });
 }
 
 function strategyForeignKeyBridge(obj, field, id) {
-    if ( obj && obj[field.es_column]) {
+    return processField(obj, field, id, (value, field, id) => {
         const fk_objs = obj[field.es_column] || [];
         const fk_schema = field.fk[0];
 
@@ -60,21 +166,23 @@ function strategyForeignKeyBridge(obj, field, id) {
             })
         })
         let bridge = {[fk_schema.bq_bridge] : bridge_rows}
-        return [{}, bridge];
-    }
-    else {
-        console.log(`${id} has missing value for ${field.es_type}`);
-    }
+        return { value: {}, bridgeValue : bridge};
+    });
 }
 
-function strategyNormal(obj, field, id) {
+function strategyDefault(obj, field, id) {
     try {
         let value = obj[field.es_column];
         const transformer = field.transformer;
         if (transformer && transformers[transformer]) {
-            value = transformers[transformer](value);
+            value = transformers[transformer](value, field);
         }
-        return {[field.bq_column] : value};
+        if ( field.bq_type !== 'CUSTOM') {
+            return {[field.bq_column] : value};
+        }
+        else {
+            return value;
+        }
     }
     catch (e) {
         console.error(e);
@@ -104,7 +212,6 @@ function parseObject(obj, mapping, id) {
     let bridgeValues = [];
     for (let field of mapping) {
         let value = null;
-        let bridgeValue = null;
         switch (field.strategy) {
             case 'flat':
                 value = strategyFlatten(obj, field, id);
@@ -115,26 +222,30 @@ function parseObject(obj, mapping, id) {
             case 'foreign_key_type':
                 value = strategyForeignKeyType(obj, field, id);
                 break;
+            case 'foreign_key_value_array':
+                value = strategyForeignKeyValueArray(obj, field, id);
+                break;
             case 'foreign_key_bridge':
-                [value, bridgeValue] = strategyForeignKeyBridge(obj, field, id);
-                if ( bridgeValue) {
-                    bridgeValues.push(bridgeValue);
+                let fk_value = strategyForeignKeyBridge(obj, field, id);
+                if ( fk_value?.bridgeValue) {
+                    bridgeValues.push(fk_value.bridgeValue);
                 }
+                value = fk_value?.value;
                 break;
             default:
-                value = strategyNormal(obj, field, id);
+                value = strategyDefault(obj, field, id);
         }
 
         if (value !== null && typeof value !== 'undefined') {
             parsedRow = Object.assign({}, parsedRow, value);
         }
     }
-    return { parsedRow, bridgeValues };
+    return { value : parsedRow, bridgeValues };
 }
 
 function transformResponse(hits, mapping) {
     let result = hits.map((hit) => parseObject(hit._source, mapping, hit._source.id));
-    let rows = result.map(r => r.parsedRow);
+    let rows = result.map(r => r.value);
     let allBridgeValues = result.flatMap(r => r.bridgeValues);
     let bridgeRows = mergeBridgeValues(allBridgeValues);
     return { rows, bridgeRows };

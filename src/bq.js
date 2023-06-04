@@ -64,6 +64,14 @@ async function createTable(tableName, schema) {
                 const nestedFields = flattenSchema(field.fk);
                 modifiedSchema.push(...nestedFields);
             } 
+            else if (field.strategy === 'foreign_key_value_array' && field.fk) {
+                // flatten the object into its properties
+                const nestedFields = flattenSchema(field.fk);
+                modifiedSchema.push(...nestedFields);
+            } 
+            else if (field.strategy === 'foreign_key_bridge' && field.fk) {
+                // do nothing
+            } 
             else {
                 if ( field.es_types ) {
                     field.es_types.forEach(type => {
@@ -72,6 +80,15 @@ async function createTable(tableName, schema) {
                             type: field.bq_type,
                             mode: 'NULLABLE'
                         });
+                    })
+                }
+                else if ( field.derivatives) {
+                    field.derivatives.forEach(derivative => {
+                        modifiedSchema.push({
+                            name: `${field.bq_column}_${derivative.suffix}`,
+                            type: derivative.bq_type,
+                            mode: 'NULLABLE'
+                        });                        
                     })
                 }
                 else {

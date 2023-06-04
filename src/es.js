@@ -158,7 +158,7 @@ function parseElasticsearchResponse(esResponse, mapping) {
 }
 
 async function search(mapping, latestTimestamp, latestId) {
-    const esResponse = await esClient.search({
+    const query = {
         index: mapping.es,
         body: {
             size: mapping.sync_batch_size || 5,
@@ -198,7 +198,11 @@ async function search(mapping, latestTimestamp, latestId) {
                 }
             },
         },
-    });
+    };
+
+    console.log(JSON.stringify(query));
+
+    const esResponse = await esClient.search(query);
 
     return esResponse.body.hits.hits;    
     // const rows = parseElasticsearchResponse(esResponse, mapping.mapping);
