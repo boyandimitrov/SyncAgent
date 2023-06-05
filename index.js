@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const mappings = require('./mappings.json');
 
-const bq = require('./src/bq');
+const bq = require('./src/sources/bq');
 const SyncManager = require('./src/sync');
 
 const syncManager = new SyncManager();

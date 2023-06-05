@@ -1,6 +1,6 @@
-const es = require('./es');
-const bq = require('./bq');
-const {transformResponse} = require('./mapper');
+const {InputDataSources, OutputDataSources} = require("./sources/register");
+const bq = require('./sources/bq');
+const {transformResponse} = require('./convertors/elastic');
 const EventEmitter = require('events');
 
 const CustomStrategyEmitter = require('./emitter');
@@ -13,21 +13,23 @@ class SyncManager extends EventEmitter {
     }
 
     async synchronize(mapping) {
-        let {syncId, syncTimestamp} = await bq.getLastSyncRecord(mapping.bq);
+
+        let {syncId, syncTimestamp} = await OutputDataSources[mapping.target].getLastSyncRecord(mapping[mapping.target]);
         
         while (this.shouldContinueSync) {
-            const hits = await es.search(mapping, syncTimestamp, syncId);
-            const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
-            if (rows?.length > 0) {
-                console.log(`insert rows in ${mapping.bq}`);
-                await bq.insertRows(mapping.bq, rows);
+            //const hits = await InputDataSources[this.source].search(mapping, syncTimestamp, syncId);
+            const searchResults = await InputDataSources[mapping.source].search(mapping, syncTimestamp, syncId);
+            //const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
+            if (searchResults.rows?.length > 0) {
+                console.log(`insert rows in ${mapping[mapping.target]}`);
+                await OutputDataSources[mapping.target].insertRows(mapping[mapping.target], searchResults.rows);
 
-                await customEmitter.emit('rowsUpserted', {table: mapping.bq, rows: rows});
+                await customEmitter.emit('rowsUpserted', {table: mapping[mapping.target], rows: searchResults.rows});
             }
 
-            if ( bridgeRows && Object.keys(bridgeRows).length > 0) {
-                for ( const bridge in bridgeRows ) {
-                    await bq.insertRows(bridge, bridgeRows[bridge]);
+            if ( searchResults.bridgeRows && Object.keys(searchResults.bridgeRows).length > 0) {
+                for ( const bridge in searchResults.bridgeRows ) {
+                    await OutputDataSources[mapping.target].insertRows(bridge, searchResults.bridgeRows[bridge]);
                 }
             }
 
@@ -37,9 +39,9 @@ class SyncManager extends EventEmitter {
             }
     
             // Remember the timestamp of the last synced document
-            syncTimestamp = hits[hits.length - 1]._source[mapping.sync_column];
-            syncId = hits[hits.length - 1]._source[mapping.sync_id_column];
-            console.log(`Synced ${rows.length} ${mapping.bq} rows`);
+            syncTimestamp = searchResults.syncTimestamp;
+            syncId = searchResults.syncId;
+            console.log(`Synced ${searchResults.rows.length} ${mapping[mapping.target]} rows`);
         }
     }
 
@@ -79,7 +81,7 @@ class SyncManager extends EventEmitter {
     startSync(mappings) {
         this.shouldContinueSync = true;
         mappings.forEach(mapping => {
-            if ( mapping.es !== 'system' ) {
+            if ( mapping[mapping.source] !== 'system' ) {
                 this.syncAndSetTimeout(mapping);
             }
         });

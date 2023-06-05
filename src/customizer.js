@@ -1,4 +1,4 @@
-const bq = require('./bq');
+const bq = require('./sources/bq');
 const CustomStrategyEmitter = require('./emitter');
 
 const customEmitter = new CustomStrategyEmitter();

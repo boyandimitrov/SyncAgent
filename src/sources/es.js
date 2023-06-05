@@ -1,5 +1,6 @@
 const { Client } = require('@elastic/elasticsearch');
-const {transformers} = require('./transformers');
+const {transformers} = require('../transformers');
+const convertor = require("../convertors/elastic");
 
 const esClient = new Client({
     node: process.env.ELASTICSEARCH_URL,
@@ -153,11 +154,7 @@ function parseObject(obj, mapping, id) {
     return parsedRow;
 }
 
-function parseElasticsearchResponse(esResponse, mapping) {
-    return esResponse.body.hits.hits.map((hit) => parseObject(hit._source, mapping, hit._source.id));
-}
-
-async function search(mapping, latestTimestamp, latestId) {
+async function _search(mapping, latestTimestamp, latestId) {
     const query = {
         index: mapping.es,
         body: {
@@ -207,6 +204,22 @@ async function search(mapping, latestTimestamp, latestId) {
     return esResponse.body.hits.hits;    
     // const rows = parseElasticsearchResponse(esResponse, mapping.mapping);
     // return rows;
+}
+
+async function search(mapping, latestTimestamp, latestId) {
+    const hits = await _search(mapping, latestTimestamp, latestId);
+
+    if (hits && hits.length > 0) {
+        const {rows, bridgeRows} = convertor.elasticToUniversal(hits, mapping.mapping);
+
+        // Remember NEWest timestamp of the last synced document
+        syncTimestamp = hits[hits.length - 1]?._source?.[mapping.sync_column];
+        syncId = hits[hits.length - 1]?._source?.[mapping.sync_id_column];
+    
+        return {rows, bridgeRows, syncTimestamp, syncId};
+    }
+
+    return {rows:[]};
 }
 
 module.exports = {

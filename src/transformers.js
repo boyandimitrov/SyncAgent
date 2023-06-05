@@ -58,6 +58,10 @@ const transformers = {
     float_to_numeric: function(value) {
         return new Big(value).toFixed(2);
     },
+    miliseconds_to_timestamp: function(value) {
+        const date = new Date(value);
+        return date.toISOString();
+    },
     timestamp_to_smartdate: function(value, field) {
 
         const column_prefix = field.bq_column;
