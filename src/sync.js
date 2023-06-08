@@ -33,7 +33,7 @@ class SyncManager extends EventEmitter {
                 }
             }
 
-            if (rows.length === 0) {
+            if (!searchResults.rows?.length) {
                 console.log('No new data to sync');
                 return syncTimestamp;
             }
@@ -41,7 +41,7 @@ class SyncManager extends EventEmitter {
             // Remember the timestamp of the last synced document
             syncTimestamp = searchResults.syncTimestamp;
             syncId = searchResults.syncId;
-            console.log(`Synced ${searchResults.rows.length} ${mapping[mapping.target]} rows`);
+            console.log(`Synced ${searchResults.rows?.length} ${mapping[mapping.target]} rows`);
         }
     }
 

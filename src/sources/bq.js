@@ -72,6 +72,9 @@ async function createTable(tableName, schema) {
             else if (field.strategy === 'foreign_key_bridge' && field.fk) {
                 // do nothing
             } 
+            else if (field.strategy === 'foreign_table') {
+                // do nothing
+            } 
             else {
                 if ( field.es_types ) {
                     field.es_types.forEach(type => {
