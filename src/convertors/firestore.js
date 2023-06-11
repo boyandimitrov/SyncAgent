@@ -1,3 +1,4 @@
+const safeEval = require('safe-eval');
 const {transformers} = require('../transformers');
 
 function processField(obj, field, id, callback) {
@@ -37,11 +38,11 @@ function strategyFormula(obj, field, id) {
         // Create a context object with values of necessary fields
         let context = {};
         for (let column of field.fb_columns) {
-            context[column] = obj[column];
+            context[column] = obj[column] || false;
         }
   
         // Evaluate the formula
-        value = eval(field.formula);
+        value = safeEval(field.formula, context);
   
     } 
     catch (e) {

@@ -26,7 +26,9 @@ async function _search(mapping, latestTimestamp, latestId) {
     const querySnapshot = await query1.get();
     querySnapshot.forEach((doc) => {
         console.log(doc.id, " => ", doc.data());
-        rows.push(doc.data());
+        let row = doc.data();
+        row.id = doc.id;
+        rows.push(row);
     });
         // let query2 = db.collection(mapping.es)
         // .where(mapping.sync_column, '>=', latestTimestamp)

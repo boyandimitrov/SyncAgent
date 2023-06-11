@@ -15,7 +15,9 @@
     "big.js": "^6.2.1",
     "date-and-time": "^3.0.0",
     "dotenv": "^16.0.3",
-    "firebase-admin": "^11.9.0"
+    "firebase-admin": "^11.9.0",
+    "safe-eval": "^0.4.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.1.3",

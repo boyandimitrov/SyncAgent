@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = reuqire('uuid');
 const {transformers} = require('../transformers');
 
 function processField(obj, field, id, callback) {
@@ -62,6 +63,16 @@ function strategyForeignKeyValueArray(obj, field, id) {
     });
 }
 
+function strategyForeignKeyArrayLast(obj, field, id) {
+    return processField(obj, field, id, async (value, field, id) => {
+        const fk_obj = obj[field.es_column] || [];
+        const fk_schema = field.fk[0];
+
+        let lastElement = fk_obj[fk_obj.length-1];
+        return {[fk_schema.bq_column] : lastElement[fk_schema.es_column]};
+    });
+}
+
 function strategyForeignKeyBridge(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
         const fk_objs = obj[field.es_column] || [];
@@ -72,6 +83,24 @@ function strategyForeignKeyBridge(obj, field, id) {
             bridge_rows.push({
                 [fk_schema.bq_primary] : id, 
                 [fk_schema.bq_column] : fk_obj[fk_schema.es_column] 
+            })
+        })
+        let bridge = {[fk_schema.bq_bridge] : bridge_rows}
+        return { value: {}, bridgeValue : bridge};
+    });
+}
+
+function strategyForeignKeyLookup(obj, field, id) {
+    return processField(obj, field, id, (value, field, id) => {
+        const fk_objs = obj[field.es_column] || [];
+        const fk_schema = field.fk[0];
+
+        let bridge_rows = [] ;
+        fk_objs.forEach(fk_obj => {
+            bridge_rows.push({
+                id : uuidv4(), 
+                [fk_schema.bq_column] : id,
+                [fk_schema.bq_column_value] : fk_obj[fk_schema.es_column]
             })
         })
         let bridge = {[fk_schema.bq_bridge] : bridge_rows}
@@ -134,12 +163,22 @@ function parseObject(obj, mapping, id) {
             case 'foreign_key_value_array':
                 value = strategyForeignKeyValueArray(obj, field, id);
                 break;
+            case 'foreign_key_array_last' : 
+                value = strategyForeignKeyArrayLast(obj, field, id);
+                break;
             case 'foreign_key_bridge':
                 let fk_value = strategyForeignKeyBridge(obj, field, id);
                 if ( fk_value?.bridgeValue) {
                     bridgeValues.push(fk_value.bridgeValue);
                 }
                 value = fk_value?.value;
+                break;
+            case 'foreign_key_lookup':
+                value = strategyForeignKeyLookup(obj, field, id);
+                if ( value?.bridgeValue) {
+                    bridgeValues.push(value.bridgeValue);
+                }
+                value = value.value;
                 break;
             default:
                 value = strategyDefault(obj, field, id);
