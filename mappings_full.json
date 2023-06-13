@@ -1,7 +1,5 @@
 [
     {
-        "source" : "es",
-        "target" : "bq",
         "es": "system",
         "bq": "tenant_objects",
         "mapping": [
@@ -20,6 +18,674 @@
             {
                 "bq_column": "timestamp",
                 "bq_type": "TIMESTAMP"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-area_v2",
+        "bq": "area",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "area",
+                "es_type": "string",
+                "bq_column": "area",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "location",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "lon",
+                        "es_type": "float",
+                        "bq_column": "longitude",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "es_column": "lat",
+                        "es_type": "float",
+                        "bq_column": "latitude",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name_bg",
+                "es_type": "string",
+                "bq_column": "name_bg",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-brand_v2",
+        "bq": "brand",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name_bg",
+                "es_type": "string",
+                "bq_column": "name_bg",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "logo",
+                "es_type": "string",
+                "bq_column": "logo",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "owner",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_distributor",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-categories_v2",
+        "bq": "categories",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "parent_id",
+                "es_type": "string",
+                "bq_column": "parent_id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "type",
+                "es_type": "string",
+                "bq_column": "type",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name_bg",
+                "es_type": "string",
+                "bq_column": "name_bg",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "active",
+                "es_type": "boolean",
+                "bq_column": "active",
+                "bq_type": "BOOL"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-manufacturer_v2",
+        "bq": "manufacturer",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "integer",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-distributor_v2",
+        "bq": "distributor",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "address",
+                "es_type": "string",
+                "bq_column": "address",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "city",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_city",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "date_created",
+                "es_type": "string",
+                "bq_column": "date_created",
+                "bq_type": "TIMESTAMP",
+                "transfromer": "string_to_timestamp"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "integer",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "logo",
+                "es_type": "string",
+                "bq_column": "logo",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "location",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "lon",
+                        "es_type": "float",
+                        "bq_column": "longitude",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "es_column": "lat",
+                        "es_type": "float",
+                        "bq_column": "latitude",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-market_v2",
+        "bq": "market",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "logo",
+                "es_type": "string",
+                "bq_column": "logo",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "integer",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "address",
+                "es_type": "string",
+                "bq_column": "address",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "headmaster",
+                "es_type": "string",
+                "bq_column": "headmaster",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "city",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_city",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "location",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "lon",
+                        "es_type": "float",
+                        "bq_column": "longitude",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "es_column": "lat",
+                        "es_type": "float",
+                        "bq_column": "latitude",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-store_v2",
+        "bq": "store",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "int",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "company",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_manufacturer",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-vehicle_v2",
+        "bq": "vehicle",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "image",
+                "es_type": "string",
+                "bq_column": "image",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "registration_number",
+                "es_type": "string",
+                "bq_column": "registration_number",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "model",
+                "es_type": "string",
+                "bq_column": "model",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "type",
+                "es_type": "string",
+                "bq_column": "type",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "company",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_manufacturer",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "position",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "location",
+                        "es_type": "object",
+                        "strategy": "flat",
+                        "flatten": [
+                            {
+                                "es_column": "lon",
+                                "es_type": "float",
+                                "bq_column": "longitude",
+                                "bq_type": "FLOAT64"
+                            },
+                            {
+                                "es_column": "lat",
+                                "es_type": "float",
+                                "bq_column": "latitude",
+                                "bq_type": "FLOAT64"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
             }
         ]
     },
@@ -195,13 +861,13 @@
                     {
                         "es_column": "value",
                         "es_type": "int",
-                        "bq_column": "expiryPeriodValue",
+                        "bq_column": "value",
                         "bq_type": "INT64"
                     },
                     {
                         "es_column": "dimension",
                         "es_type": "string",
-                        "bq_column": "expiryPeriodDimenstion",
+                        "bq_column": "dimenstion",
                         "bq_type": "STRING"
                     }
                 ]
@@ -214,19 +880,19 @@
                     {
                         "es_column": "value",
                         "es_type": "float",
-                        "bq_column": "packagingValue",
+                        "bq_column": "value",
                         "bq_type": "FLOAT64"
                     },
                     {
                         "es_column": "dimension",
                         "es_type": "string",
-                        "bq_column": "packagingDimenstion",
+                        "bq_column": "dimenstion",
                         "bq_type": "STRING"
                     },
                     {
                         "es_column": "type",
                         "es_type": "string",
-                        "bq_column": "packagingType",
+                        "bq_column": "type",
                         "bq_type": "STRING"
                     }
                 ]
@@ -244,13 +910,13 @@
                             {
                                 "es_column": "value",
                                 "es_type": "float",
-                                "bq_column": "priceValue",
+                                "bq_column": "value",
                                 "bq_type": "FLOAT64"
                             },
                             {
                                 "es_column": "currency",
                                 "es_type": "string",
-                                "bq_column": "priceCurrency",
+                                "bq_column": "currency",
                                 "bq_type": "STRING"
                             }
                         ]
@@ -258,7 +924,7 @@
                     {
                         "es_column": "sortPrice",
                         "es_type": "float",
-                        "bq_column": "priceSortPrice",
+                        "bq_column": "sortPrice",
                         "bq_type": "FLOAT64"
                     }
                 ]
@@ -299,6 +965,257 @@
                         "es_type": "string",
                         "bq_column": "fk_category",
                         "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "expiryPeriod",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "value",
+                        "es_type": "int",
+                        "bq_column": "value",
+                        "bq_type": "INT64"
+                    },
+                    {
+                        "es_column": "dimension",
+                        "es_type": "string",
+                        "bq_column": "dimenstion",
+                        "bq_type": "STRING"
+                    }
+                ]
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
+            },
+            {
+                "es_column": "tid",
+                "es_type": "array",
+                "strategy": "foreign_key_value_array",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_tenant_info",
+                        "bq_type": "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-stock_v2",
+        "bq": "stock",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name_bg",
+                "es_type": "string",
+                "bq_column": "name_bg",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "active",
+                "es_type": "boolean",
+                "bq_column": "active",
+                "bq_type": "BOOL"
+            },
+            {
+                "es_column": "measurable",
+                "es_type": "boolean",
+                "bq_column": "measurable",
+                "bq_type": "BOOL"
+            },
+            {
+                "es_column": "weightInBarcode",
+                "es_type": "boolean",
+                "bq_column": "weightInBarcode",
+                "bq_type": "BOOL"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "image",
+                "es_type": "string",
+                "bq_column": "image",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "description_bg",
+                "es_type": "string",
+                "bq_column": "description_bg",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "code",
+                "es_type": "string",
+                "bq_column": "code",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "receiptName_bg",
+                "es_type": "string",
+                "bq_column": "receiptName_bg",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "expiryPeriod",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "value",
+                        "es_type": "int",
+                        "bq_column": "value",
+                        "bq_type": "INT64"
+                    },
+                    {
+                        "es_column": "dimension",
+                        "es_type": "string",
+                        "bq_column": "dimenstion",
+                        "bq_type": "STRING"
+                    }
+                ]
+            },
+            {
+                "es_column": "packaging",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "value",
+                        "es_type": "float",
+                        "bq_column": "value",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "es_column": "dimension",
+                        "es_type": "string",
+                        "bq_column": "dimenstion",
+                        "bq_type": "STRING"
+                    },
+                    {
+                        "es_column": "type",
+                        "es_type": "string",
+                        "bq_column": "type",
+                        "bq_type": "STRING"
+                    }
+                ]
+            },
+            {
+                "es_column": "price",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "originalPrice",
+                        "es_type": "object",
+                        "strategy": "flat",
+                        "flatten": [
+                            {
+                                "es_column": "value",
+                                "es_type": "float",
+                                "bq_column": "value",
+                                "bq_type": "FLOAT64"
+                            },
+                            {
+                                "es_column": "currency",
+                                "es_type": "string",
+                                "bq_column": "currency",
+                                "bq_type": "STRING"
+                            }
+                        ]
+                    },
+                    {
+                        "es_column": "sortPrice",
+                        "es_type": "float",
+                        "bq_column": "sortPrice",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "manufacturer",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_manufacturer",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "productBase",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_product_base",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "category",
+                "es_type": "object",
+                "strategy": "foreign_key_array_last",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_category",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "expiryPeriod",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "value",
+                        "es_type": "int",
+                        "bq_column": "value",
+                        "bq_type": "INT64"
+                    },
+                    {
+                        "es_column": "dimension",
+                        "es_type": "string",
+                        "bq_column": "dimenstion",
+                        "bq_type": "STRING"
                     }
                 ]
             },
@@ -377,13 +1294,13 @@
                     {
                         "es_column": "value",
                         "es_type": "int",
-                        "bq_column": "expiryPeriodValue",
+                        "bq_column": "value",
                         "bq_type": "INT64"
                     },
                     {
                         "es_column": "dimension",
                         "es_type": "string",
-                        "bq_column": "expiryPeriodDimenstion",
+                        "bq_column": "dimension",
                         "bq_type": "STRING"
                     }
                 ]
@@ -396,52 +1313,20 @@
                     {
                         "es_column": "value",
                         "es_type": "float",
-                        "bq_column": "packagingValue",
+                        "bq_column": "value",
                         "bq_type": "FLOAT64"
                     },
                     {
                         "es_column": "dimension",
                         "es_type": "string",
-                        "bq_column": "packagingDimenstion",
+                        "bq_column": "dimension",
                         "bq_type": "STRING"
                     },
                     {
                         "es_column": "type",
                         "es_type": "string",
-                        "bq_column": "packagingType",
+                        "bq_column": "type",
                         "bq_type": "STRING"
-                    }
-                ]
-            },
-            {
-                "es_column": "price",
-                "es_type": "object",
-                "strategy": "flat",
-                "flatten": [
-                    {
-                        "es_column": "originalPrice",
-                        "es_type": "object",
-                        "strategy": "flat",
-                        "flatten": [
-                            {
-                                "es_column": "value",
-                                "es_type": "float",
-                                "bq_column": "priceValue",
-                                "bq_type": "FLOAT64"
-                            },
-                            {
-                                "es_column": "currency",
-                                "es_type": "string",
-                                "bq_column": "priceCurrency",
-                                "bq_type": "STRING"
-                            }
-                        ]
-                    },
-                    {
-                        "es_column": "sortPrice",
-                        "es_type": "float",
-                        "bq_column": "priceSortPrice",
-                        "bq_type": "FLOAT64"
                     }
                 ]
             },
@@ -458,13 +1343,13 @@
                             {
                                 "es_column": "value",
                                 "es_type": "float",
-                                "bq_column": "purchasePriceValue",
+                                "bq_column": "value",
                                 "bq_type": "FLOAT64"
                             },
                             {
                                 "es_column": "currency",
                                 "es_type": "string",
-                                "bq_column": "purchasePriceCurrency",
+                                "bq_column": "currency",
                                 "bq_type": "STRING"
                             }
                         ]
@@ -472,7 +1357,39 @@
                     {
                         "es_column": "sortPrice",
                         "es_type": "float",
-                        "bq_column": "purchasePriceSortPrice",
+                        "bq_column": "sortPrice",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "price",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "originalPrice",
+                        "es_type": "object",
+                        "strategy": "flat",
+                        "flatten": [
+                            {
+                                "es_column": "value",
+                                "es_type": "float",
+                                "bq_column": "value",
+                                "bq_type": "FLOAT64"
+                            },
+                            {
+                                "es_column": "currency",
+                                "es_type": "string",
+                                "bq_column": "currency",
+                                "bq_type": "STRING"
+                            }
+                        ]
+                    },
+                    {
+                        "es_column": "sortPrice",
+                        "es_type": "float",
+                        "bq_column": "sortPrice",
                         "bq_type": "FLOAT64"
                     }
                 ]
@@ -520,6 +1437,19 @@
                 "es_type": "int",
                 "bq_column": "minQuantity",
                 "bq_type": "INT64"
+            },
+            {
+                "es_column": "company",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_distributor",
+                        "bq_type": "STRING"
+                    }
+                ]
             },
             {
                 "es_column": "currentQuantity",
@@ -795,7 +1725,7 @@
             {
                 "es_column": "@timestamp",
                 "es_type": "date",
-                "bq_column": "timestamp",
+                "bq_column": "@timestamp",
                 "bq_type": "TIMESTAMP"
             },
             {
@@ -1082,12 +2012,6 @@
         ],
         "mapping": [
             {
-                "es_column": "id",
-                "es_type": "string",
-                "bq_column": "id",
-                "bq_type": "STRING"
-            },
-            {
                 "es_column": "identifier",
                 "es_type": "string",
                 "bq_column": "identifier",
@@ -1185,12 +2109,6 @@
                         "bq_column_value" : "email"
                     }
                 ]
-            },
-            {
-                "es_column": "@timestamp",
-                "es_type": "string",
-                "bq_column": "timestamp",
-                "bq_type": "TIMESTAMP"
             }
         ]
     },
@@ -1387,13 +2305,13 @@
                     {
                         "es_column": "value",
                         "es_type": "float",
-                        "bq_column": "from_value",
+                        "bq_column": "total_price_value",
                         "bq_type": "FLOAT64"
                     },
                     {
                         "es_column": "currency",
                         "es_type": "string",
-                        "bq_column": "from_currency",
+                        "bq_column": "total_price_currency",
                         "bq_type": "STRING"
                     }
                 ]
@@ -1406,13 +2324,13 @@
                     {
                         "es_column": "value",
                         "es_type": "float",
-                        "bq_column": "to_value",
+                        "bq_column": "total_price_value",
                         "bq_type": "FLOAT64"
                     },
                     {
                         "es_column": "currency",
                         "es_type": "string",
-                        "bq_column": "to_currency",
+                        "bq_column": "total_price_currency",
                         "bq_type": "STRING"
                     }
                 ]
@@ -1511,13 +2429,13 @@
                     {
                         "es_column": "value",
                         "es_type": "int",
-                        "bq_column": "discount_value",
+                        "bq_column": "value",
                         "bq_type": "INT64"
                     },
                     {
                         "es_column": "dimension",
                         "es_type": "string",
-                        "bq_column": "discount_dimenstion",
+                        "bq_column": "dimenstion",
                         "bq_type": "STRING"
                     }
                 ]
@@ -1562,13 +2480,13 @@
                     {
                         "es_column": "value",
                         "es_type": "float",
-                        "bq_column": "from_value",
+                        "bq_column": "total_price_value",
                         "bq_type": "FLOAT64"
                     },
                     {
                         "es_column": "currency",
                         "es_type": "string",
-                        "bq_column": "from_currency",
+                        "bq_column": "total_price_currency",
                         "bq_type": "STRING"
                     }
                 ]
@@ -1581,13 +2499,13 @@
                     {
                         "es_column": "value",
                         "es_type": "float",
-                        "bq_column": "to_value",
+                        "bq_column": "total_price_value",
                         "bq_type": "FLOAT64"
                     },
                     {
                         "es_column": "currency",
                         "es_type": "string",
-                        "bq_column": "to_currency",
+                        "bq_column": "total_price_currency",
                         "bq_type": "STRING"
                     }
                 ]

@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = reuqire('uuid');
+const { v4: uuidv4 } = require('uuid');
 const {transformers} = require('../transformers');
 
 function processField(obj, field, id, callback) {
@@ -178,7 +178,7 @@ function parseObject(obj, mapping, id) {
                 if ( value?.bridgeValue) {
                     bridgeValues.push(value.bridgeValue);
                 }
-                value = value.value;
+                value = value?.value;
                 break;
             default:
                 value = strategyDefault(obj, field, id);
