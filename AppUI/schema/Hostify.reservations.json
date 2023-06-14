@@ -1,0 +1,62 @@
+[
+    {
+        "name" : "consumer_sex",
+        "type" : "string",
+        "mode" : "nullable"
+    },
+    {
+        "name" : "consumer_name",
+        "type" : "string",
+        "mode" : "nullable"
+    },
+    {
+        "name" : "consumer_email",
+        "type" : "string"
+    },
+        {
+        "name" : "consumer_country",
+        "type" : "string"
+    },
+    {
+        "name" : "property_name",
+        "type" : "string",
+        "mode" : "nullable"
+    },
+    {
+        "name" : "property_address_id",
+        "type" : "string",
+        "subtype" : "fk",
+        "table" : "address"
+    },
+    {
+        "name" : "property_rating",
+        "type" : "int64",
+        "mode" : "nullable"
+    },
+    {
+        "name" : "owner_sex",
+        "type" : "string",
+        "mode" : "nullable"
+    },
+    {
+        "name" : "owner_name",
+        "type" : "string",
+        "mode" : "nullable"
+    },
+    {
+        "name" : "reservation_date",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "reservation_period",
+        "type" : "int64"
+    },
+    {
+        "name" : "reservation_price",
+        "type" : "numeric"
+    },
+    {
+        "name" : "consumer_birthday",
+        "type" : "timestamp"
+    }
+]

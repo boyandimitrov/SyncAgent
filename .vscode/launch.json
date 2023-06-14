@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "App UI Server",
+            "request": "launch",
+            "command": "node index.js",
+            "cwd": "${workspaceFolder}/AppUI"
+        }
+    ]
+}

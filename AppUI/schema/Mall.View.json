@@ -1,0 +1,100 @@
+
+[
+    {
+        "name" : "transactionLines_code",
+        "type" : "string"
+    },
+    {
+        "name" : "transactionLines_created",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "transactionLines_inPromotion",
+        "type" : "boolean"
+    },
+    {
+        "name" : "transactionLines_price",
+        "type" : "float64"
+    },
+    {
+        "name" : "transactionLines_quantityType",
+        "type" : "string"
+    },
+    {
+        "name" : "transactionLines_quantityValue",
+        "type" : "float64"
+    },
+    {
+        "name" : "transactionLines_updated",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "transactionLines_fk_product",
+        "type" : "string"
+    },
+    {
+        "name" : "transactionLines_fk_transaction",
+        "type" : "string"
+    },
+    {
+        "name" : "transactionLines_timestamp",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "transactionLines_id",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_id",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_firebaseTenantId",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_receiptNumber",
+        "type" : "int64"
+    },
+    {
+        "name" : "transaction_status",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_fk_user",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_fk_shop",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_fk_checkout",
+        "type" : "string"
+    },
+    {
+        "name" : "transaction_updated",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "transaction_created_master",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "Headquarter",
+        "type" : "string"
+    },
+    {
+        "name" : "CIK",
+        "type" : "string"
+    },
+    {
+        "name" : "Founded",
+        "type" : "string"
+    },
+    {
+        "name" : "Country",
+        "type" : "string"
+    }
+]
+	

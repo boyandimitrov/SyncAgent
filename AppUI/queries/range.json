@@ -1,0 +1,18 @@
+{
+    "group" : [
+        {
+            "field" : "reservation_season"
+        },
+        {
+            "field" : "reservation_price",
+            "range" : [200, 600]
+        }
+    ],
+    "aggregation" : [
+        {
+            "field" : "reservation_price",
+            "formula" : "count"
+        }
+    ]
+}
+

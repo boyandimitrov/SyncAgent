@@ -1,0 +1,25 @@
+{
+    "group" : [
+        {
+            "field" : "property_country"
+        },
+        {
+            "field" : "reservation_season"
+        },
+        {
+            "field" : "consumer_country"
+        },
+        {
+            "field" : "reservation_price"
+        }
+    ],
+    "filter" : {
+        "reservation_season" : {"$in" : ["Spring", "Summer"]}
+    },
+    "aggregation" : [
+        {
+            "field" : "reservation_price",
+            "formula" : "SUM"
+        }
+    ]
+}

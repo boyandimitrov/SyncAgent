@@ -1,0 +1,28 @@
+[
+    {
+        "name" : "id",
+        "type" : "string"
+    },
+    {
+        "name" : "country",
+        "type" : "string"
+    },
+    {
+        "name" : "post_code",
+        "type" : "string"
+    },
+    {
+        "name" : "state",
+        "type" : "string",
+        "subtype" : "us_state"
+    },
+    {
+        "name" : "city",
+        "type" : "string",
+        "subtype" : "city"
+    },
+    {
+        "name" : "street",
+        "type" : "string"
+    }
+]

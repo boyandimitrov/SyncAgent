@@ -1,0 +1,46 @@
+
+[
+    {
+        "name" : "Ticker",
+        "type" : "string"
+    },
+    {
+        "name" : "Name",
+        "type" : "string"
+    },
+    {
+        "name" : "Sector",
+        "type" : "string"
+    },
+    {
+        "name" : "SubIndustry",
+        "type" : "string"
+    },
+    {
+        "name" : "Headquarter",
+        "type" : "string"
+    },
+    {
+        "name" : "CIK",
+        "type" : "string"
+    },
+    {
+        "name" : "Founded",
+        "type" : "string"
+    },
+    {
+        "name" : "Country",
+        "type" : "string"
+    },
+    {
+        "name" : "State",
+        "type" : "string", 
+        "subtype" : "us_state",
+        "prop" : "NAME"
+    },
+    {
+        "name" : "City",
+        "type" : "string",
+        "subtype" : "city"
+    }
+]
