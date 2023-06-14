@@ -3,7 +3,6 @@
         "source" : "fb",
         "target" : "bq",
         "fb" : "transactions_1",
-
         "bq" : "transaction",
         "sync_batch_size" : 100,
         "sync_column" : "updated",

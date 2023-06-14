@@ -10,16 +10,681 @@
                 "bq_type": "STRING"
             },
             {
+                "bq_column": "id_unknown",
+                "bq_type": "STRING"
+            },
+            {
+                "bq_column": "id_type",
+                "bq_type": "STRING"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es" : "promoto-country_v2",
+        "bq" : "country",
+        "sync_batch_size" : 100,
+        "id_column" : "id.keyword",
+        "sync_id_column" : "id",
+        "sync_column" : "@timestamp",
+        "mapping" : [
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "native",
+                "es_type": "string",
+                "bq_column": "native",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
                 "bq_column": "name",
                 "bq_type": "STRING"
             },
             {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es" : "promoto-city_v2",
+        "bq" : "city",
+        "sync_batch_size" : 100,
+        "id_column" : "id.keyword",
+        "sync_id_column" : "id",
+        "sync_column" : "@timestamp",
+        "mapping" : [
+            {
+                "es_column" : "id",
+                "es_type" : "string",
+                "bq_column" : "id",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "name",
+                "es_type" : "string",
+                "bq_column" : "name",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "name_bg",
+                "es_type" : "string",
+                "bq_column" : "name_bg",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "location",
+                "es_type" : "object",
+                "strategy" : "flat",
+                "flatten" : [
+                    {
+                        "es_column" : "lon",
+                        "es_type" : "float",
+                        "bq_column" : "longitude",
+                        "bq_type" : "FLOAT64"
+                    },
+                    {
+                        "es_column" : "lat",
+                        "es_type" : "float",
+                        "bq_column" : "latitude",
+                        "bq_type" : "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column" : "country",
+                "es_type" : "string",
+                "bq_column" : "fk_country",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "area",
+                "es_type" : "string",
+                "bq_column" : "area",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "@timestamp",
+                "es_type" : "string",
+                "bq_column" : "timestamp",
+                "bq_type" : "TIMESTAMP"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-manufacturer_v2",
+        "bq": "manufacturer",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "integer",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es" : "promoto-user_v2",
+        "bq" : "users",
+        "sync_batch_size" : 2,
+        "id_column" : "id.keyword",
+        "sync_id_column" : "id",
+        "sync_column" : "@timestamp",
+        "mapping" : [
+            {
+                "es_column" : "id",
+                "es_type" : "string",
+                "bq_column" : "id",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "name",
+                "es_type" : "string",
+                "bq_column" : "name",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "type",
+                "es_type" : "string",
+                "bq_column" : "type",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "email",
+                "es_type" : "string",
+                "bq_column" : "email",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column" : "role",
+                "es_type" : "string",
+                "bq_column" : "role",
+                "bq_type" : "STRING"
+            },
+            {
+                "es_column": "company",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_manufacturer",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-distributor_v2",
+        "bq": "distributor",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "address",
+                "es_type": "string",
+                "bq_column": "address",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "city",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_city",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "date_created",
+                "es_type": "string",
+                "bq_column": "date_created",
+                "bq_type": "TIMESTAMP",
+                "transfromer": "string_to_timestamp"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "integer",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "logo",
+                "es_type": "string",
+                "bq_column": "logo",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "location",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "lon",
+                        "es_type": "float",
+                        "bq_column": "longitude",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "es_column": "lat",
+                        "es_type": "float",
+                        "bq_column": "latitude",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
+                    {
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "distributor",
+                        "bq_type" : "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-market_v2",
+        "bq": "market",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "logo",
+                "es_type": "string",
+                "bq_column": "logo",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "integer",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "address",
+                "es_type": "string",
+                "bq_column": "address",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "headmaster",
+                "es_type": "string",
+                "bq_column": "headmaster",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "city",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_city",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "location",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "lon",
+                        "es_type": "float",
+                        "bq_column": "longitude",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "es_column": "lat",
+                        "es_type": "float",
+                        "bq_column": "latitude",
+                        "bq_type": "FLOAT64"
+                    }
+                ]
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
+                    {
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "market",
+                        "bq_type" : "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-store_v2",
+        "bq": "store",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "currency",
+                "es_type": "string",
+                "bq_column": "currency",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "vat",
+                "es_type": "int",
+                "bq_column": "vat",
+                "bq_type": "INT64"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "company",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_manufacturer",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
+                    {
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "store",
+                        "bq_type" : "STRING"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "source" : "es",
+        "target" : "bq",
+        "es": "promoto-vehicle_v2",
+        "bq": "vehicle",
+        "sync_batch_size": 100,
+        "id_column": "id.keyword",
+        "sync_id_column": "id",
+        "sync_column": "@timestamp",
+        "mapping": [
+            {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "image",
+                "es_type": "string",
+                "bq_column": "image",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "identifier",
+                "es_type": "string",
+                "bq_column": "identifier",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "date",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            },
+            {
+                "es_column": "registration_number",
+                "es_type": "string",
+                "bq_column": "registration_number",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "name",
+                "es_type": "string",
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "model",
+                "es_type": "string",
+                "bq_column": "model",
+                "bq_type": "STRING"
+            },
+            {
+                "es_column": "type",
+                "es_type": "string",
                 "bq_column": "type",
                 "bq_type": "STRING"
             },
             {
-                "bq_column": "timestamp",
-                "bq_type": "TIMESTAMP"
+                "es_column": "company",
+                "es_type": "object",
+                "strategy": "foreign_key_simple",
+                "fk": [
+                    {
+                        "es_column": "id",
+                        "es_type": "string",
+                        "bq_column": "fk_manufacturer",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "position",
+                "es_type": "object",
+                "strategy": "flat",
+                "flatten": [
+                    {
+                        "es_column": "location",
+                        "es_type": "object",
+                        "strategy": "flat",
+                        "flatten": [
+                            {
+                                "es_column": "lon",
+                                "es_type": "float",
+                                "bq_column": "longitude",
+                                "bq_type": "FLOAT64"
+                            },
+                            {
+                                "es_column": "lat",
+                                "es_type": "float",
+                                "bq_column": "latitude",
+                                "bq_type": "FLOAT64"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
+                    {
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "vehicle",
+                        "bq_type" : "STRING"
+                    }
+                ]
             }
         ]
     },
@@ -103,15 +768,17 @@
                 ]
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tenant_info",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "product_base",
+                        "bq_type" : "STRING"
                     }
                 ]
             }
@@ -303,15 +970,17 @@
                 ]
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tenant_info",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "product",
+                        "bq_type" : "STRING"
                     }
                 ]
             }
@@ -490,15 +1159,17 @@
                 "bq_type": "TIMESTAMP"
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tenant_info",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "stock",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -646,9 +1317,11 @@
                 "strategy" : "foreign_key_value_array",
                 "fk" : [
                     {
-                        "es_column" : "id",
-                        "es_type" : "string",
-                        "bq_column" : "fk_tenant_info",
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "invoice_number",
                         "bq_type" : "STRING"
                     }
                 ]
@@ -749,9 +1422,11 @@
                 "strategy" : "foreign_key_value_array",
                 "fk" : [
                     {
-                        "es_column" : "id",
-                        "es_type" : "string",
-                        "bq_column" : "fk_tenant_info",
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "invoice_rule",
                         "bq_type" : "STRING"
                     }
                 ]
@@ -837,15 +1512,17 @@
                 ]
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tid",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "shopping_cart",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -1159,15 +1836,17 @@
                 "bq_type": "STRING"
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_client_info",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "shop",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -1249,15 +1928,17 @@
                 ]
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tid",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "checkout",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -1298,15 +1979,17 @@
                 "bq_type": "STRING"
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tid",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "price_group",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -1347,15 +2030,17 @@
                 "bq_type": "STRING"
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tid",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "price_rule",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -1523,15 +2208,17 @@
                 ]
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_tid",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "price_list",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -1625,6 +2312,187 @@
                         "bq_type" : "STRING"
                     }
                 ]
+            }
+        ]
+    },
+    {
+        "source" : "fb",
+        "target" : "bq",
+        "fb" : "transactions_1",
+        "bq" : "transaction",
+        "sync_batch_size" : 100,
+        "sync_column" : "updated",
+        "sync_column2" : "created",
+        "id_column" : "id",
+        "bridges" : [
+            {
+                "source" : "fb",
+                "target" : "bq",
+                "bq" : "transactionLines",
+                "mapping" : [
+                    {
+                        "fb_column" : "code",
+                        "fb_type" : "string",
+                        "bq_column" : "code",
+                        "bq_type" : "STRING"
+                    },
+                    {
+                        "fb_column": "created",
+                        "fb_type": "integer",
+                        "bq_column": "created",
+                        "bq_type": "TIMESTAMP",
+                        "transformer" : "miliseconds_to_timestamp"
+                    },
+                    {
+                        "fb_column": "inPromotion",
+                        "fb_type": "bool",
+                        "bq_column": "inPromotion",
+                        "bq_type": "BOOL"
+                    },
+                    {
+                        "fb_column": "price",
+                        "fb_type": "float",
+                        "bq_column": "price",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "fb_column": "quantityType",
+                        "fb_type": "string",
+                        "bq_column": "quantityType",
+                        "bq_type": "STRING"
+                    },
+                    {
+                        "fb_column": "quantityValue",
+                        "fb_type": "integer",
+                        "bq_column": "quantityValue",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
+                        "fb_column": "updated",
+                        "fb_type": "integer",
+                        "bq_column": "updated",
+                        "bq_type": "TIMESTAMP",
+                        "transformer" : "miliseconds_to_timestamp"
+                    },
+                    {
+                        "fb_column" : "product",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_simple",
+                        "fk" : [
+                            {
+                                "fb_column" : "id",
+                                "fb_type" : "string",
+                                "bq_column" : "fk_product",
+                                "bq_type" : "string"
+                            }
+                        ]
+                    },
+                    {
+                        "fb_column" : "id",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_parent",
+                        "bq_column" : "fk_transaction",
+                        "bq_type" : "string"
+                    },
+                    {
+                        "fb_columns": ["updated", "created"],
+                        "fb_type": "integer",
+                        "strategy" : "formula",
+                        "bq_column": "timestamp",
+                        "bq_type": "TIMESTAMP",
+                        "transformer" : "miliseconds_to_timestamp",
+                        "formula" : "updated || created"
+                    },
+                    {
+                        "fb_column" : "id",
+                        "fb_type" : "string",
+                        "bq_column" : "id",
+                        "bq_type" : "STRING"
+                    }        
+                ]
+            }       
+        ],
+        "mapping" : [
+            {
+                "fb_column" : "id",
+                "fb_type" : "string",
+                "bq_column" : "id",
+                "bq_type" : "STRING"
+            },
+            {
+                "fb_column": "firebaseTenantId",
+                "fb_type": "string",
+                "bq_column": "firebaseTenantId",
+                "bq_type": "STRING"
+            },
+            {
+                "fb_column": "receiptNumber",
+                "fb_type": "int",
+                "bq_column": "receiptNumber",
+                "bq_type": "INT64"
+            },
+            {
+                "fb_column": "status",
+                "fb_type": "string",
+                "bq_column": "status",
+                "bq_type": "STRING"
+            },
+            {
+                "fb_column": "userId",
+                "fb_type": "string",
+                "bq_column" : "fk_user",
+                "bq_type" : "string"
+            },
+            {
+                "fb_column": "shopId",
+                "fb_type": "string",
+                "bq_column" : "fk_shop",
+                "bq_type" : "string"
+            },
+            {
+                "fb_column": "checkoutId",
+                "fb_type": "string",
+                "bq_column" : "fk_checkout",
+                "bq_type" : "string"
+            },
+            {
+                "fb_column": "updated",
+                "fb_type": "integer",
+                "bq_column": "updated",
+                "bq_type": "TIMESTAMP",
+                "transformer" : "miliseconds_to_timestamp"
+            },
+            {
+                "fb_column": "created",
+                "fb_type": "integer",
+                "bq_column": "created",
+                "bq_type" : "CUSTOM",
+                "derivatives" :[
+                    { "suffix" : "master", "bq_type" : "TIMESTAMP" },
+                    { "suffix" : "quarter", "bq_type" : "INT64" },
+                    { "suffix" : "half",  "bq_type" : "INT64" },
+                    { "suffix" : "year", "bq_type" : "INT64" },
+                    { "suffix" : "month", "bq_type" : "INT64" },
+                    { "suffix" : "date", "bq_type" : "INT64" },
+                    { "suffix" : "day", "bq_type" : "INT64" },
+                    { "suffix" : "week",  "bq_type" : "INT64" }                    
+                ],
+                "transformer" : "timestamp_to_smartdate"
+            },
+            {
+                "fb_columns": ["updated", "created"],
+                "fb_type": "integer",
+                "strategy" : "formula",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP",
+                "transformer" : "miliseconds_to_timestamp",
+                "formula" : "updated || created"
+            },
+            {
+                "fb_column" : "transactionLines",
+                "fb_type" : "array",
+                "strategy" : "foreign_table",
+                "fb_table" : "transactionLines"
             }
         ]
     }

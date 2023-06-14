@@ -30,7 +30,7 @@ function strategyForeignKeySimple(obj, field, id) {
 
 
 function strategyForeignKeyType(obj, field, id) {
-    return processField(obj, field, id, async (value, field, id) => {
+    return processField(obj, field, id, (value, field, id) => {
         const fk_obj = obj[field.es_column];
         const fk_schema = field.fk[0];
 
@@ -49,23 +49,36 @@ function strategyForeignKeyType(obj, field, id) {
 }
 
 function strategyForeignKeyValueArray(obj, field, id) {
-    return processField(obj, field, id, async (value, field, id) => {
+    return processField(obj, field, id, (value, field, id) => {
         const fk_obj = obj[field.es_column];
         const fk_schema = field.fk[0];
 
-        let result = {};
-        for ( let id of fk_obj ) {
-            if (id !== null && typeof id !== 'undefined') {
-                result[fk_schema.bq_column] = id;
+        let bridge_rows = [] ;
+        for ( let arr_val of fk_obj ) {
+            let row = {
+                [fk_schema.bq_primary] : id, 
+                [fk_schema.bq_column] : arr_val 
             }
+
+            if ( fk_schema.bq_id_type) {
+                row[fk_schema.bq_type_column] = fk_schema.bq_id_type;
+            }
+
+            bridge_rows.push(row);
         }
-        return result;
+
+        let bridge = {[fk_schema.bq_bridge] : bridge_rows}
+        return { value: {}, bridgeValue : bridge};        
     });
 }
 
 function strategyForeignKeyArrayLast(obj, field, id) {
-    return processField(obj, field, id, async (value, field, id) => {
+    return processField(obj, field, id, (value, field, id) => {
         const fk_obj = obj[field.es_column] || [];
+        if ( !fk_obj.length ) {
+            return {};
+        }
+
         const fk_schema = field.fk[0];
 
         let lastElement = fk_obj[fk_obj.length-1];
@@ -162,6 +175,10 @@ function parseObject(obj, mapping, id) {
                 break;
             case 'foreign_key_value_array':
                 value = strategyForeignKeyValueArray(obj, field, id);
+                if ( value?.bridgeValue) {
+                    bridgeValues.push(value.bridgeValue);
+                }
+                value = value?.value;
                 break;
             case 'foreign_key_array_last' : 
                 value = strategyForeignKeyArrayLast(obj, field, id);
