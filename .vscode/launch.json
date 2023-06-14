@@ -6,6 +6,13 @@
             "request": "launch",
             "command": "node index.js",
             "cwd": "${workspaceFolder}/AppUI"
+        },
+        {
+            "type": "node-terminal",
+            "name": "Import",
+            "request": "launch",
+            "command": "node index_import.js",
+            "cwd": "${workspaceFolder}/AppUI"
         }
     ]
 }

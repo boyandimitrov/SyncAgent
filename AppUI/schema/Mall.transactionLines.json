@@ -1,0 +1,48 @@
+
+[
+    {
+        "name" : "code",
+        "type" : "string"
+    },
+    {
+        "name" : "created",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "inPromotion",
+        "type" : "boolean"
+    },
+    {
+        "name" : "price",
+        "type" : "float64"
+    },
+    {
+        "name" : "quantityType",
+        "type" : "string"
+    },
+    {
+        "name" : "quantityValue",
+        "type" : "float64"
+    },
+    {
+        "name" : "updated",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "fk_product",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_transaction",
+        "type" : "string"
+    },
+    {
+        "name" : "timestamp",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "id",
+        "type" : "string"
+    }
+]
+	

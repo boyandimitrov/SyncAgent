@@ -308,8 +308,9 @@ function get_joins(params, raw_fields) {
 
 async function query(params) {
     let raw_fields = get_fields(params);
-    const {fields, joins, aliases} = get_joins(params, raw_fields)
-    const query = build_query(params, fields, joins, aliases);
+    //const {fields, joins, aliases} = get_joins(params, raw_fields)
+    //const query = build_query(params, fields, joins, aliases);
+    const query = build_query(params, raw_fields);
 
     const options = {
       query: query
@@ -378,7 +379,7 @@ const convert_to_rows = (items, schema) => {
 };
 
 const import_rows = async (items, params) => {
-    let physical_schema = require(`../schema/${params.dataset}.${params.table}.json`);
+    let physical_schema = require(`../schema/${params.dataset}.${params.view}.json`);
     let schema = logical_schema(physical_schema);
 
     let rows = convert_to_rows(items, schema);

@@ -1,0 +1,40 @@
+
+[
+    {
+        "name" : "id",
+        "type" : "string"
+    },
+    {
+        "name" : "firebaseTenantId",
+        "type" : "string"
+    },
+    {
+        "name" : "receiptNumber",
+        "type" : "int64"
+    },
+    {
+        "name" : "status",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_user",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_shop",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_checkout",
+        "type" : "string"
+    },
+    {
+        "name" : "updated",
+        "type" : "timestamp"
+    },
+    {
+        "name" : "created_master",
+        "type" : "timestamp"
+    }
+]
+	

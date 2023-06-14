@@ -29,7 +29,8 @@ function enrich_timestamp(dates) {
 module.exports = {
     logical_schema : (schema) => {
         let dates = schema.filter(item => item.type === 'timestamp');
-        let full_dates = enrich_timestamp(dates);
+        //let full_dates = enrich_timestamp(dates);
+        let full_dates = dates;
     
         let remaining = schema.filter(item => item.type !== 'timestamp');
     
