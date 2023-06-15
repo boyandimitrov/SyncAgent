@@ -321,7 +321,8 @@ async function query(params) {
     let result = {rows:rows};
 
     if (params.rows_count) {
-        result.rows_count = await count(params, joins, aliases);
+        //result.rows_count = await count(params, joins, aliases);
+        result.rows_count = await count(params, [], {});
     }
 
     //console.log('Rows:');

@@ -11,7 +11,10 @@ const get_value = (field) => {
         return field.farr[faker[field.fobj][field.ffunc](field.fparam)];
     }
     else if ( field.fobj && field.ffunc) {
-        if ( field.fparam ) {
+        if ( field.fparam && field.sparam) {
+            value = faker[field.fobj][field.ffunc](field.fparam, field.sparam);
+        }
+        else if ( field.fparam ) {
             value = faker[field.fobj][field.ffunc](field.fparam);
         }
         else {
@@ -64,7 +67,7 @@ const fake_transaction_lines = (items_count=1000, tables = {}) => {
             code : get_value({fobj: "random", ffunc : "alpha", fparam : {length: 8, casing: 'upper'}}),
             created : get_value({fobj: "date", ffunc : "past"}),
             inPromotion	: get_value({fobj: "datatype", ffunc : "boolean", fparam : { probability: 0.1 }}),
-            price : get_value({fobj: "commerce", ffunc : "price", fparam : { max: 200 }}),
+            price : get_value({fobj: "commerce", ffunc : "price", fparam : 0, sparam:100}),
             quantityType : get_value({farr : ["count", "kgs"], fobj: "datatype", ffunc : "number", fparam : { min:0, max: 1 }}),
             quantityValue : get_value({fobj: "datatype", ffunc : "number", fparam : { min:0, max: 100 }}),
             updated	: get_value({fobj: "date", ffunc : "past"}),
@@ -92,7 +95,7 @@ const fake = async () => {
         rows: []
     };
 
-    let items_count = 1000;
+    let items_count = 100;
     do {
         let batch_count = items_count >= INSERT_BATCH ? INSERT_BATCH : items_count;
 
