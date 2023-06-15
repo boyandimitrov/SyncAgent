@@ -92,7 +92,7 @@ const fake = async () => {
         rows: []
     };
 
-    let items_count = 1000;
+    let items_count = 10000;
     do {
         let batch_count = items_count >= INSERT_BATCH ? INSERT_BATCH : items_count;
 
@@ -108,7 +108,7 @@ const fake = async () => {
 
     input.table = "transactionLines";
     input.view = "transactionLines";
-    items_count = 2000;
+    items_count = 20000;
     tables["transaction"].count = tables["transaction"].rows.length;
     do {
         let batch_count = items_count >= INSERT_BATCH ? INSERT_BATCH : items_count;

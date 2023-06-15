@@ -10,8 +10,9 @@ const ds = {
     "dataset" : "Mall",
     "table" : "VIEW"
 }
-const fields = ["transaction_status", "transaction_created_master", "transactionLines_price", "transactionLines_quantityType", "transactionLines_quantityValue"]
+const fields = ["product_name_bg", "transactionLines_price", "transactionLines_quantityType", "transactionLines_quantityValue", "transaction_status"]
 const schema = [
+    {"name":"product_name_bg","type":"string","mode":"nullable"},
     {"name":"transaction_status","type":"string","mode":"nullable"},
     {"name":"transaction_created_master","type":"timestamp","mode":"nullable"},
     {"name":"transactionLines_price","type":"float64"},
