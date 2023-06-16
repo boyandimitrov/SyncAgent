@@ -34,6 +34,11 @@
     },
     {
         "name" : "created_master",
+        "type" : "timestamp",
+        "subtype" : "enrich"
+    },
+    {
+        "name" : "timestamp",
         "type" : "timestamp"
     }
 ]

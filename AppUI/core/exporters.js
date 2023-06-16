@@ -1,6 +1,6 @@
 module.exports = {
     timestamp : [
-        {"name" : "", type: "timestamp", func: (d) => {return new Date(d).getTime()/1000}},
+        {"name" : "_master", type: "timestamp", func: (d) => {return new Date(d).getTime()/1000}},
         //{"name" : "", type: "timestamp", func: (d) => {let r = df.format(new Date(d), 'YYYY-MM-DD HH:mm:ss'); return r;}},
         //{"name" : "", type: "datetime", func: (d) => {return bigquery.datetime( new Date(d))}},
         {"name" : `_quarter`, type : "int64", subtype: "quarter", func : (d) => { return Math.floor(new Date(d).getMonth() / 3 + 1)}},

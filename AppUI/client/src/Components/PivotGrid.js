@@ -27,7 +27,9 @@ export default class PivotGrid extends React.Component {
                 let col_schema = schema.filter(column => column.name===field_name)[0];    
                 if ( col_schema && col_schema.type === 'timestamp') {
                     column_definition['render'] = (record) => {
-                        return new Date(record.value).toLocaleDateString()
+                        if ( record && record.value) {
+                            return new Date(record.value).toLocaleDateString()
+                        }
                     }
                 }
 

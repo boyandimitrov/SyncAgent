@@ -321,7 +321,8 @@ async function query(params) {
     let result = {rows:rows};
 
     if (params.rows_count) {
-        result.rows_count = await count(params, joins, aliases);
+        //result.rows_count = await count(params, joins, aliases);
+        result.rows_count = await count(params, [], {});
     }
 
     //console.log('Rows:');
@@ -361,16 +362,16 @@ const convert_to_rows = (items, schema) => {
         let row = {};
 
         schema.forEach(field => {
-            if ( !field.func) {
+            //if ( !field.func) {
                 row[field.name] = item[field.name];
-            }
-            else {
-                let main_name = field.name;
-                if ( field.subtype ) {
-                    main_name = field.name.replace(`_${field.subtype}`, "");
-                }
-                row[field.name] = field.func(item[main_name])
-            }
+            //}
+            // else {
+            //     let main_name = field.name;
+            //     if ( field.subtype ) {
+            //         main_name = field.name.replace(`_${field.subtype}`, "");
+            //     }
+            //     row[field.name] = field.func(item[main_name])
+            // }
         });
 
         rows.push(row);

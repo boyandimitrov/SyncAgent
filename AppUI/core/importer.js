@@ -11,7 +11,10 @@ const get_value = (field) => {
         return field.farr[faker[field.fobj][field.ffunc](field.fparam)];
     }
     else if ( field.fobj && field.ffunc) {
-        if ( field.fparam ) {
+        if ( field.fparam && field.sparam) {
+            value = faker[field.fobj][field.ffunc](field.fparam, field.sparam);
+        }
+        else if ( field.fparam ) {
             value = faker[field.fobj][field.ffunc](field.fparam);
         }
         else {
@@ -33,6 +36,51 @@ const get_item_from_table = (tables, table_name) => {
     return t.rows[random];
 }
 
+const fake_past_date = (years) => {
+    let now = new Date();
+    let fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(now.getFullYear() - years);
+    
+    // Returns a random integer between min (inclusive) and max (inclusive).
+    function getRandomIntInclusive(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    // Get timestamp of dates
+    let nowTs = now.getTime();
+    let fiveYearsAgoTs = fiveYearsAgo.getTime();
+    
+    // Generate a random timestamp between now and five years ago
+    let randomTs = getRandomIntInclusive(fiveYearsAgoTs, nowTs);
+    
+    // Create a new date object with the random timestamp
+    let randomDate = new Date(randomTs);
+    
+    console.log(randomDate);
+    return randomDate;    
+}
+
+const setCreated = (item) => {
+    let created = fake_past_date(5);
+    item.created_master = created.toISOString();
+    item.created_quarter = Math.floor(created.getMonth() / 3 + 1);
+    item.created_half = Math.floor(created.getMonth() / 6 + 1);
+    item.created_year = created.getFullYear();
+    item.created_month = Math.floor(created.getMonth() + 1);
+    item.created_date = created.getDate();
+    item.created_day = created.getDay() + 1;
+    item.created_week = (d => {
+        let dUtc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        let dayNum = dUtc.getUTCDay() || 7;
+        dUtc.setUTCDate(dUtc.getUTCDate() + 4 - dayNum);
+        let yearStart = new Date(Date.UTC(dUtc.getUTCFullYear(),0,1));
+        return Math.ceil((((dUtc - yearStart) / 86400000) + 1)/7)
+
+    })(created);
+}
+
 const fake_transaction = (items_count=1000, tables = {}) => {
     let items = [];
 
@@ -41,7 +89,6 @@ const fake_transaction = (items_count=1000, tables = {}) => {
             id : get_value({fobj: "datatype", ffunc : "uuid"}),
             firebaseTenantId : get_value({fobj: "random", ffunc : "alpha", fparam : {length: 8, casing: 'upper'}}),
             receiptNumber	: get_value({fobj: "datatype", ffunc : "number", fparam : {  min:10000, max: 99999 }}),
-            created_master : get_value({fobj: "date", ffunc : "past"}),
             updated	: get_value({fobj: "date", ffunc : "past"}),
             fk_user	: get_item_from_table(tables, "users")["id"],
             fk_shop	: get_item_from_table(tables, "shop")["id"],
@@ -50,6 +97,7 @@ const fake_transaction = (items_count=1000, tables = {}) => {
             status : get_value({farr : ["inProgress", "reversed", "completed"], fobj: "datatype", ffunc : "number", fparam : { min:0, max: 2 }})
         };
 
+        setCreated(item);
         items.push(item);
     }
 
@@ -64,7 +112,7 @@ const fake_transaction_lines = (items_count=1000, tables = {}) => {
             code : get_value({fobj: "random", ffunc : "alpha", fparam : {length: 8, casing: 'upper'}}),
             created : get_value({fobj: "date", ffunc : "past"}),
             inPromotion	: get_value({fobj: "datatype", ffunc : "boolean", fparam : { probability: 0.1 }}),
-            price : get_value({fobj: "commerce", ffunc : "price", fparam : { max: 200 }}),
+            price : get_value({fobj: "commerce", ffunc : "price", fparam : 0, sparam:100}),
             quantityType : get_value({farr : ["count", "kgs"], fobj: "datatype", ffunc : "number", fparam : { min:0, max: 1 }}),
             quantityValue : get_value({fobj: "datatype", ffunc : "number", fparam : { min:0, max: 100 }}),
             updated	: get_value({fobj: "date", ffunc : "past"}),
@@ -92,7 +140,7 @@ const fake = async () => {
         rows: []
     };
 
-    let items_count = 10000;
+    let items_count = 100;
     do {
         let batch_count = items_count >= INSERT_BATCH ? INSERT_BATCH : items_count;
 
