@@ -19,6 +19,8 @@ const schema = [
     {"name":"transactionLines_quantityType","type":"string"},
     {"name":"transactionLines_quantityValue","type":"NUMERIC","mode":"nullable"},
     {"name":"transaction_created_year","type":"int64","system":true, subtype: "year"},
+    {"name":"transaction_created_quarter","type":"int64","system":true, subtype: "quarter"},
+    {"name" : "categories_name_bg", "type" : "string"}
     // {"name":"Country","type":"string","mode":"nullable"},
     // {"name":"State","type":"string","mode":"nullable", subtype: "us_state", prop : "NAME"},
     // {"name":"City","type":"string","mode":"nullable", subtype: "city"}
