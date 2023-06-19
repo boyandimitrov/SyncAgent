@@ -1974,6 +1974,7 @@
         "id_column": "id.keyword",
         "sync_id_column": "id",
         "sync_column": "@timestamp",
+        "fakers" : ["area", "city"],
         "bridges" : [
             {
                 "bq" : "shop_email",
@@ -2012,6 +2013,12 @@
         ],
         "mapping": [
             {
+                "es_column": "id",
+                "es_type": "string",
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
                 "es_column": "identifier",
                 "es_type": "string",
                 "bq_column": "identifier",
@@ -2026,6 +2033,32 @@
                         "es_column": "id",
                         "es_type": "string",
                         "bq_column": "fk_country",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "faker",
+                "fk": [
+                    {
+                        "faker_column": "id",
+                        "faker_type": "area",
+                        "bq_column": "fk_area",
+                        "bq_type": "string"
+                    }
+                ]
+            },
+            {
+                "es_column": "country",
+                "es_type": "object",
+                "strategy": "faker",
+                "fk": [
+                    {
+                        "faker_column": "id",
+                        "faker_type": "city",
+                        "bq_column": "fk_city",
                         "bq_type": "string"
                     }
                 ]
@@ -2071,7 +2104,7 @@
                     {
                         "es_column": "id",
                         "es_type": "string",
-                        "bq_column": "fk_manufacturer",
+                        "bq_column": "fk_market",
                         "bq_type": "string"
                     }
                 ]
@@ -2083,15 +2116,17 @@
                 "bq_type": "STRING"
             },
             {
-                "es_column": "tid",
-                "es_type": "array",
-                "strategy": "foreign_key_value_array",
-                "fk": [
+                "es_column" : "tid",
+                "es_type" : "array",
+                "strategy" : "foreign_key_value_array",
+                "fk" : [
                     {
-                        "es_column": "id",
-                        "es_type": "string",
-                        "bq_column": "fk_client_info",
-                        "bq_type": "STRING"
+                        "bq_bridge" : "tenant_objects",
+                        "bq_primary" : "id",
+                        "bq_column" : "id_unknown",
+                        "bq_type_column" : "id_type",
+                        "bq_id_type" : "shop",
+                        "bq_type" : "STRING"
                     }
                 ]
             },
@@ -2109,6 +2144,12 @@
                         "bq_column_value" : "email"
                     }
                 ]
+            },
+            {
+                "es_column": "@timestamp",
+                "es_type": "string",
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
             }
         ]
     },

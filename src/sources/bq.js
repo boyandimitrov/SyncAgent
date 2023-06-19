@@ -59,12 +59,22 @@ async function createTable(tableName, schema) {
                 const nestedFields = flattenSchema(field.fk);
                 modifiedSchema.push(...nestedFields);
             } 
+            else if (field.strategy === 'faker' && field.fk) {
+                // flatten the object into its properties
+                const nestedFields = flattenSchema(field.fk);
+                modifiedSchema.push(...nestedFields);
+            } 
             else if (field.strategy === 'foreign_key_type' && field.fk) {
                 // flatten the object into its properties
                 const nestedFields = flattenSchema(field.fk);
                 modifiedSchema.push(...nestedFields);
             } 
             else if (field.strategy === 'foreign_key_array_last' && field.fk) {
+                // flatten the object into its properties
+                const nestedFields = flattenSchema(field.fk);
+                modifiedSchema.push(...nestedFields);
+            } 
+            else if (field.strategy === 'foreign_key_array_index' && field.fk) {
                 // flatten the object into its properties
                 const nestedFields = flattenSchema(field.fk);
                 modifiedSchema.push(...nestedFields);

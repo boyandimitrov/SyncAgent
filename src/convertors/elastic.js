@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const {transformers} = require('../transformers');
+const importer = require("../../AppUI/core/importer")
 
 function processField(obj, field, id, callback) {
     if (obj && obj[field.es_column]) {
@@ -28,6 +29,16 @@ function strategyForeignKeySimple(obj, field, id) {
     });
 }
 
+function strategyFaker(obj, field, id, ctx) {
+    return processField(obj, field, id, (value, field, id) => {
+        const fk_schema = field.fk[0];
+        const result = importer.get_item_from_table(ctx.fakers, fk_schema.faker_type);
+
+        if (result !== null && typeof result !== 'undefined') {
+            return {[fk_schema.bq_column] : result[fk_schema.faker_column]};
+        }
+    });
+}
 
 function strategyForeignKeyType(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
@@ -83,6 +94,23 @@ function strategyForeignKeyArrayLast(obj, field, id) {
 
         let lastElement = fk_obj[fk_obj.length-1];
         return {[fk_schema.bq_column] : lastElement[fk_schema.es_column]};
+    });
+}
+
+function strategyForeignKeyArrayIndex(obj, field, id) {
+    return processField(obj, field, id, (value, field, id) => {
+        const fk_obj = obj[field.es_column] || [];
+        if ( !fk_obj.length ) {
+            return {};
+        }
+
+        const fk_schema = field.fk[0];
+
+        let lastElement = fk_obj[field.index];
+        if (lastElement) {
+            return {[fk_schema.bq_column] : lastElement[fk_schema.es_column]};
+        }
+        return {};
     });
 }
 
@@ -158,9 +186,10 @@ function mergeBridgeValues(bridgeValues) {
     return result;
 }
 
-function parseObject(obj, mapping, id) {
+function parseObject(obj, mapping, id, ctx) {
     let parsedRow = {};
     let bridgeValues = [];
+
     for (let field of mapping) {
         let value = null;
         switch (field.strategy) {
@@ -182,6 +211,12 @@ function parseObject(obj, mapping, id) {
                 break;
             case 'foreign_key_array_last' : 
                 value = strategyForeignKeyArrayLast(obj, field, id);
+                break;
+            case 'foreign_key_array_index' : 
+                value = strategyForeignKeyArrayIndex(obj, field, id);
+                break;
+            case 'faker' : 
+                value = strategyFaker(obj, field, id, ctx);
                 break;
             case 'foreign_key_bridge':
                 let fk_value = strategyForeignKeyBridge(obj, field, id);
@@ -208,8 +243,9 @@ function parseObject(obj, mapping, id) {
     return { value : parsedRow, bridgeValues };
 }
 
-function elasticToUniversal(hits, mapping) {
-    let result = hits.map((hit) => parseObject(hit._source, mapping, hit._source.id));
+function elasticToUniversal(hits, mapping, fakers) {
+    let ctx = {fakers:fakers};
+    let result = hits.map((hit) => parseObject(hit._source, mapping, hit._source.id, ctx));
     let rows = result.map(r => r.value);
     let allBridgeValues = result.flatMap(r => r.bridgeValues);
     let bridgeRows = mergeBridgeValues(allBridgeValues);

@@ -1,7 +1,7 @@
 const { faker } = require('@faker-js/faker');
 const db = require("./db");
 
-const foreign_tables = ["product", "users", "shop", "checkout"];
+const foreign_tables = ["product_base", "users", "shop", "checkout", "manufacturer", "store", "distributor"];
 
 const INSERT_BATCH = 1000;
 
@@ -13,6 +13,12 @@ const get_value = (field) => {
     else if ( field.fobj && field.ffunc) {
         if ( field.fparam && field.sparam) {
             value = faker[field.fobj][field.ffunc](field.fparam, field.sparam);
+        }
+        else if ( field.fparam && field.iparam) {
+            let fake_val = faker[field.fobj][field.ffunc](field.fparam);
+            if ( field.iparam.multiply) {
+                value = field.iparam.multiply * fake_val;
+            }
         }
         else if ( field.fparam ) {
             value = faker[field.fobj][field.ffunc](field.fparam);
@@ -116,11 +122,17 @@ const fake_transaction_lines = (items_count=1000, tables = {}) => {
             quantityType : get_value({farr : ["count", "kgs"], fobj: "datatype", ffunc : "number", fparam : { min:0, max: 1 }}),
             quantityValue : get_value({fobj: "datatype", ffunc : "number", fparam : { min:0, max: 100 }}),
             updated	: get_value({fobj: "date", ffunc : "past"}),
-            fk_product	: get_item_from_table(tables, "product")["id"],
+            fk_product	: get_item_from_table(tables, "product_base")["id"],
             fk_transaction	: get_item_from_table(tables, "transaction")["id"],
+            fk_manufacturer	: get_item_from_table(tables, "manufacturer")["id"],
+            fk_store	: get_item_from_table(tables, "store")["id"],
+            fk_distributor	: get_item_from_table(tables, "distributor")["id"],
+            fk_distributor_store : get_item_from_table(tables,"distributor_store")["id"],
             timestamp: new Date().toISOString(),
             id : get_value({fobj: "datatype", ffunc : "uuid"}),
         };
+
+        item.profit = get_value({fobj: "datatype", ffunc : "number", fparam : { min:10, max: 50 }, iparam : { multiply : (parseFloat(item.price) / 100)} }),
 
         items.push(item);
     }
@@ -136,6 +148,23 @@ const fake = async () => {
         view : "transaction"
     }
     let tables = await db.load_tables(foreign_tables, {dataset : "Mall"});
+    let arrays = {
+        "distributor_store" : {
+            count : 4,
+            rows : [{
+                "id": "2cc860ee-a0ed-4817-a094-4bbf45f7321a"
+              }, {
+                "id": "2f96abd2-3962-4698-9968-7c1084d41a79"
+              }, {
+                "id": "f2e6f660-bfcb-4c31-b6d0-7869c58341f2"
+              }, {
+                "id": "f4265839-e82f-40a8-be04-e906b876d085"
+              }]
+        }
+    }
+
+    tables = { ...tables, ...arrays };
+
     tables["transaction"] = {
         rows: []
     };
@@ -171,5 +200,5 @@ const fake = async () => {
 }
 
 module.exports = {
-    fake
+    fake, get_item_from_table
 }

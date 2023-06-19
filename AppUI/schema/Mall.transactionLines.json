@@ -17,6 +17,10 @@
         "type" : "float64"
     },
     {
+        "name" : "profit",
+        "type" : "float64"
+    },
+    {
         "name" : "quantityType",
         "type" : "string"
     },
@@ -34,6 +38,22 @@
     },
     {
         "name" : "fk_transaction",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_distributor",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_distributor_store",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_store",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_manufacturer",
         "type" : "string"
     },
     {

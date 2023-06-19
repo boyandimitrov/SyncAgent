@@ -72,6 +72,45 @@
                         ]
                     },
                     {
+                        "fb_column" : "product",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_simple",
+                        "fk" : [
+                            {
+                                "fb_column" : "id",
+                                "fb_type" : "string",
+                                "bq_column" : "fk_distributor",
+                                "bq_type" : "string"
+                            }
+                        ]
+                    },
+                    {
+                        "fb_column" : "product",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_simple",
+                        "fk" : [
+                            {
+                                "fb_column" : "id",
+                                "fb_type" : "string",
+                                "bq_column" : "fk_store",
+                                "bq_type" : "string"
+                            }
+                        ]
+                    },
+                    {
+                        "fb_column" : "product",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_simple",
+                        "fk" : [
+                            {
+                                "fb_column" : "id",
+                                "fb_type" : "string",
+                                "bq_column" : "fk_manufacturer",
+                                "bq_type" : "string"
+                            }
+                        ]
+                    },
+                    {
                         "fb_column" : "id",
                         "fb_type" : "object",
                         "strategy" : "foreign_key_parent",

@@ -2,6 +2,7 @@ const {InputDataSources, OutputDataSources} = require("./sources/register");
 const bq = require('./sources/bq');
 const {transformResponse} = require('./convertors/elastic');
 const EventEmitter = require('events');
+const importer = require("../AppUI/core/db")
 
 const CustomStrategyEmitter = require('./emitter');
 
@@ -10,6 +11,20 @@ class SyncManager extends EventEmitter {
     constructor() {
         super();
         this.shouldContinueSync = true;
+        this.loadedFakers = {};
+    }
+
+    async loadFakers(fakers) {
+        let loaded = Object.keys(this.loadedFakers);
+        
+        let difference = fakers.filter(value => !loaded.includes(value));
+
+        if (difference?.length ) {
+            let tables = await importer.load_tables(difference, {dataset : "Mall"});
+
+            this.loadedFakers = {...this.loadedFakers, ...tables};
+
+        }
     }
 
     async synchronize(mapping) {
@@ -18,6 +33,12 @@ class SyncManager extends EventEmitter {
         
         while (this.shouldContinueSync) {
             //const hits = await InputDataSources[this.source].search(mapping, syncTimestamp, syncId);
+
+            if ( mapping.fakers?.length) {
+                await this.loadFakers(mapping.fakers);
+                mapping.loadedFakers = this.loadedFakers;
+            }
+
             const searchResults = await InputDataSources[mapping.source].search(mapping, syncTimestamp, syncId);
             //const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
             if (searchResults.rows?.length > 0) {
