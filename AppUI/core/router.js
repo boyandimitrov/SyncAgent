@@ -46,6 +46,28 @@ router.post('/aggregate', async (req, res) => {
         const output = ds_man.aggregate(rows, input);
 
         const result = { results : output};
+
+        memory_hash[req.hash_key] = result;
+
+        res.send(result);
+    }
+    catch(e) {
+        res.send({err: e});
+    }
+})
+
+router.post('/distincts', async (req, res) => {
+    console.log('request =' + JSON.stringify(req.body))
+
+    const input = req.body;
+
+    try {
+        const result = {};
+
+        if ( input.distincts ) {
+            result.distincts = await ds_man.get_distincts(input);
+        }
+
         memory_hash[req.hash_key] = result;
 
         res.send(result);

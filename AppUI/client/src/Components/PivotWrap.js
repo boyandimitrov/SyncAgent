@@ -21,7 +21,6 @@ export default class PivotWrap extends React.Component {
             data : this.props.data || [],
             aggregator : aggregator
         };
-
     }
 
     getData() {

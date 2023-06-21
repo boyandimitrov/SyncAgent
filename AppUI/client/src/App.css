@@ -40,6 +40,10 @@
   }
 }
 
+.ant-layout-header {
+  background-color: #f0f2f5;
+}
+
 .ant-layout-content {
   overflow:auto;
 }

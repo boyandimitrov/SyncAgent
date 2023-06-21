@@ -1,5 +1,6 @@
 const {BigQuery} = require('@google-cloud/bigquery');
 const {logical_schema} = require('./logical_schema.js');
+const { param } = require('./router.js');
 
 const bigquery = new BigQuery({
     projectId: process.env.BQ_ID,
@@ -421,7 +422,33 @@ const load_tables = async (tables, ctx) => {
     return result;
 }
 
+const get_distincts = async(params) => {
+    const keys = Object.keys(params.distincts);
+
+    for ( const key of keys ) {
+        let distinct = params.distincts[key];
+        let fields = [` distinct ${distinct.field} `];
+
+        const queryParams = {
+            dataset : params.dataset,
+            table : distinct.table            
+        }
+
+        const query = build_query(queryParams, fields);
+
+        const options = {
+            query: query
+        };
+    
+        const [rows] = await bigquery.query(options);
+    
+        params.distincts[key].rows = rows;
+    }
+
+    return params.distincts;
+}
+
 module.exports = {
-    query, aggregate, import_rows, load_tables, custom_query
+    query, aggregate, import_rows, load_tables, custom_query, get_distincts
 }
 

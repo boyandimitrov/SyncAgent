@@ -1,3 +1,4 @@
+import isEqual from 'fast-deep-equal'
 import React from 'react';
 import axios from "axios";
 import {Collapse, Layout, Select, Radio } from 'antd';
@@ -7,6 +8,7 @@ import PivotCities from './PivotCities';
 import PivotBar from './PivotBar';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import TableRenderers from "react-pivottable/TableRenderers";
+import { disconnect } from 'process';
 //import Plot from 'react-plotly.js';
 //import createPlotlyRenderers from "react-pivottable/PlotlyRenderers";
 
@@ -34,12 +36,15 @@ const { Header, Footer, Sider, Content } = Layout;
 // }
  
 export default class PivotPivot extends React.Component {
+    distinctProps = {};
+
     constructor(props) {
         super(props);
         this.state = {
             data : this.props.data,
             pivot : this.props.pivot || {},
             details : [],
+            distincts : [],
             rendererName : 'Table',
             options : (this.props.schema || []).map(({name, type}) => {
 
@@ -93,7 +98,6 @@ export default class PivotPivot extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps !== this.props) {
-            debugger
 
             if ( this.props.aggregation) {
                 this.aggregation = this.props.aggregation;
@@ -179,6 +183,10 @@ export default class PivotPivot extends React.Component {
 
         query.group = [].concat(rows).concat(cols);
 
+        if ( this.state.distinctProps ) {
+            query.distincts = this.state.distinctProps;
+        }
+
         query.aggregation = [
             {
                 field : this.aggregation.aggregatorField,
@@ -187,6 +195,7 @@ export default class PivotPivot extends React.Component {
             }
         ]
 
+        this.getDistinctData();
         this.setState({
             query : query, 
             rows : (this.aggregation.abscissa || []).map(({value}) => value), 
@@ -266,10 +275,66 @@ export default class PivotPivot extends React.Component {
         this.executeAggregation();
     }
 
+    getDistinctData() {
+        const isQueryReady = this.isQueryReady();
+        if (!isQueryReady) {
+            return
+        }
+
+        debugger
+        const schema = this.props.schema;
+        let distincts = {};
+        let groups = this.aggregation.abscissa.concat(this.aggregation.ordinate);
+        groups.forEach(group => {
+            let col_schema = schema.filter(column => column.name===group.value)[0];    
+            if ( col_schema?.distinct ) {
+                distincts[col_schema.name] = col_schema.distinct;
+            }
+        })
+
+        // if ( isEqual(distincts, this.distinctProps)) {
+        //     return;
+        // }
+
+        this.distinctProps = distincts;
+
+        let query = {
+            "dataset" : this.props.ds.dataset,
+            distincts : this.distinctProps
+        }
+
+        const self = this;
+        axios
+            .post(`${process.env.REACT_APP_BASE_URL}/distincts`, query)
+            .then((response) => {                
+                let distincts = response.data.distincts;
+                let controlsOptions = [];
+                let keys = Object.keys(distincts);
+                for (let key of keys ) {
+                    let distinct = distincts[key];
+        
+                    if ( distinct.rows?.length) {
+                        let options = distinct.rows.map(item => {
+                            return {
+                                label : item[key],
+                                value : item[key]
+                            }
+                        })
+                        controlsOptions.push({options, label: key});
+                    }
+                }
+        
+                if ( controlsOptions.length ) {
+                    self.setState({distincts : controlsOptions});
+                }
+            })
+    }
+
     handleAbscissaChanged(value, groups) {
         const schema = this.props.schema;
         let self = this;
         let details = [];
+        let distincts = {};
         groups.forEach(group => {
             let col_schema = schema.filter(column => column.name===group.value)[0];    
             if ( col_schema && !col_schema.system ) {
@@ -277,6 +342,9 @@ export default class PivotPivot extends React.Component {
                 if (type === 'INT64' || type === 'NUMERIC') {
                     details.push(group)
                 }
+            }
+            else if ( col_schema?.distinct ) {
+                distincts[col_schema.name] = col_schema.distincts;
             }
         })
 
@@ -298,12 +366,16 @@ export default class PivotPivot extends React.Component {
         const schema = this.props.schema;
         let self = this;
         let details = [];
+        let distincts = {};
         groups.forEach(group => {
             let col_schema = schema.filter(column => column.name===group.value)[0];    
             if ( col_schema && !col_schema.system ) {
                 const type = col_schema.type.toUpperCase();
                 if (type === 'INT64' || type === 'NUMERIC') {
                     details.push(group)
+                }
+                else if ( col_schema?.distinct ) {
+                    distincts[col_schema.name] = col_schema.distinct;
                 }
             }
         })
@@ -388,6 +460,41 @@ export default class PivotPivot extends React.Component {
 
     cbSelectionCreated (filter) {
         this.props.cbSelectionCreated(filter, this.aggregation);
+    }
+
+    renderHeader(isQueryReady) {
+        if ( !isQueryReady ) {
+            return
+        }
+
+        if ( !this.state.distincts) {
+            return 
+        }
+
+        debugger
+
+        let i=0;
+        return (
+            <div>
+                {this.state.distincts.map(({ options, label }) => (
+                    <div>
+                        <div>{label}</div>
+                        <Select
+                            key={`distincts${i++}`}
+                            mode="multiple"
+                            allowClear
+                            placeholder=""
+                            //onChange={handleChange}
+                            options={options}
+                            // onChange={(ranges) => { this.handleDetailsChanged(ranges, value)}}
+                            // filterSort={(optionA, optionB) =>
+                            //     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                            // }
+                        />
+                    </div>
+            ))}                
+            </div>
+        )
     }
 
     renderControl (isQueryReady) {
@@ -577,6 +684,9 @@ export default class PivotPivot extends React.Component {
                     </Collapse>
                 </Sider>
                 <Layout>
+                    <Header>
+                        {this.renderHeader(isQueryReady)}
+                    </Header>
                     <Content>
                        {this.renderControl(isQueryReady)}
                     </Content>

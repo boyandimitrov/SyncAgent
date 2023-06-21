@@ -1,0 +1,9 @@
+Components map
+
+Pivot
+    PivotControl
+        PivotGrid
+        PivotPivot
+            Slider
+            PivotWrap, PivotBar, PivotMap, PivotCities
+                
