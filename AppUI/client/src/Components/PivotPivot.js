@@ -81,6 +81,7 @@ export default class PivotPivot extends React.Component {
         this.handleSlicerChanged = this.handleSlicerChanged.bind(this);
         this.handleRendererNameChanged = this.handleRendererNameChanged.bind(this);
         this.handleTagChange = this.handleTagChange.bind(this);
+        this.handleDistinctsChanged = this.handleDistinctsChanged.bind(this);        
         this.cbSelectionCreated = this.cbSelectionCreated.bind(this);
     }
 
@@ -160,6 +161,21 @@ export default class PivotPivot extends React.Component {
             }
 
             query.filter[this.aggregation.slicer.name] = this.aggregation.slicer.value;
+        }
+        if (this.aggregation.distincts) {
+            if ( !query.filter) {
+                query.filter = {};
+            }
+
+            for ( let key in this.aggregation.distincts) {
+                let value = this.aggregation.distincts[key];
+                if ( value?.length === 1 ) {
+                    query.filter[key] = value[0];
+                }
+                else if ( value?.length > 1) {
+                    query.filter[key] = { "$in" : value};
+                }
+            }
         }
 
         let self = this;
@@ -259,6 +275,17 @@ export default class PivotPivot extends React.Component {
                 })}
             </Radio.Group>
         )
+    }
+
+    handleDistinctsChanged(ranges, label) {
+        debugger
+        console.log(`Select control ${label} changed. Selected values:`, ranges);
+        if ( !this.aggregation.distincts ) {
+            this.aggregation.distincts = {};
+        }
+        this.aggregation.distincts[label] = ranges;
+
+        this.executeAggregation();
     }
 
     handleAggregatorChanged(value, option) {
@@ -470,31 +497,26 @@ export default class PivotPivot extends React.Component {
             return 
         }
 
-        let i=0;
         return (
             <Row>
-                {this.state.distincts.map(({ options, label }) => (
+                {this.state.distincts.map(({ options, label }, index) => (
                     <Col className={'distincts'}>
                         <div>{label}</div>
                         <Select
-                            key={`distincts${i++}`}
+                            key={`distincts${index}`}
                             style={{ width: '100%' }}
                             mode="multiple"
                             allowClear
                             placeholder=""
-                            //onChange={handleChange}
                             options={options}
-                            // onChange={(ranges) => { this.handleDetailsChanged(ranges, value)}}
-                            // filterSort={(optionA, optionB) =>
-                            //     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                            // }
+                            onChange={(ranges) => { this.handleDistinctsChanged(ranges, label)}}
                         />
                     </Col>
-            ))}                
+                ))}
             </Row>
         )
     }
-
+        
     renderControl (isQueryReady) {
         if ( !isQueryReady ) {
             return
