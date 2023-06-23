@@ -1,7 +1,7 @@
 import isEqual from 'fast-deep-equal'
 import React from 'react';
 import axios from "axios";
-import {Collapse, Layout, Select, Radio } from 'antd';
+import {Collapse, Layout, Select, Radio, Row, Col } from 'antd';
 import PivotWrap from './PivotWrap';
 import PivotMap from './PivotMap';
 import PivotCities from './PivotCities';
@@ -281,7 +281,6 @@ export default class PivotPivot extends React.Component {
             return
         }
 
-        debugger
         const schema = this.props.schema;
         let distincts = {};
         let groups = this.aggregation.abscissa.concat(this.aggregation.ordinate);
@@ -471,16 +470,15 @@ export default class PivotPivot extends React.Component {
             return 
         }
 
-        debugger
-
         let i=0;
         return (
-            <div>
+            <Row>
                 {this.state.distincts.map(({ options, label }) => (
-                    <div>
+                    <Col className={'distincts'}>
                         <div>{label}</div>
                         <Select
                             key={`distincts${i++}`}
+                            style={{ width: '100%' }}
                             mode="multiple"
                             allowClear
                             placeholder=""
@@ -491,9 +489,9 @@ export default class PivotPivot extends React.Component {
                             //     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             // }
                         />
-                    </div>
+                    </Col>
             ))}                
-            </div>
+            </Row>
         )
     }
 

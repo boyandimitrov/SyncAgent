@@ -42,6 +42,8 @@
 
 .ant-layout-header {
   background-color: #f0f2f5;
+  line-height: normal;
+  padding: 0 10px;
 }
 
 .ant-layout-content {
