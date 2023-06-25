@@ -43,7 +43,9 @@ function get_fields(params) {
         throw "queries without a single field is not supproted."
     }
 
-    return fields;
+    return [...new Set(fields)];
+
+    //return fields;
 }
 
 function iterate_filter_fields (filter, accumulator) {
@@ -180,8 +182,13 @@ function build_filter(filter, aliases) {
     if ( ! filter ) {
         return "";
     }
+    let filterClause = `  ${itterate_filter(filter, aliases)} `;
 
-    return ` where ${itterate_filter(filter, aliases)} `;
+    if ( filterClause.trim() !== "" ) {
+        return ` where ${filterClause} `;
+    }
+
+    return "";
 }
 
 function build_group_by(group=[], aliases) {
