@@ -205,6 +205,7 @@ export default class PivotPivot extends React.Component {
 
         query.aggregation = [
             {
+                fieldSchema : this.getFieldSchema(this.aggregation.aggregatorField),
                 field : this.aggregation.aggregatorField,
                 formula : this.aggregation.aggregatorName,
                 gridFormula : this.aggregation.aggregatorGridName
@@ -291,7 +292,13 @@ export default class PivotPivot extends React.Component {
         this.executeAggregation();
     }
 
+    getFieldSchema(value) {
+        const schema = this.props.schema;
+        return schema.filter(column => column.name===value)[0];    
+    }
+
     handleAggregatorChanged(value, option) {
+
         this.aggregation.aggregatorName = value;
         this.aggregation.aggregatorGridName = option.label;
         this.aggregation.aggregatorField = null;
@@ -504,7 +511,7 @@ export default class PivotPivot extends React.Component {
             <Row>
                 {this.state.distincts.map(({ options, label }, index) => (
                     <Col className={'distincts'}>
-                        <div>{label}</div>
+                        <div>{this.getFieldSchema(label).label}</div>
                         <Select
                             key={`distincts${index}`}
                             style={{ width: '100%' }}

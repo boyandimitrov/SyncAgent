@@ -29,6 +29,7 @@ export default class PivotWrap extends React.Component {
         axios
             .post(`${process.env.REACT_APP_BASE_URL}/aggregate`, this.props.query)
             .then((response) => {
+                debugger
                 let headers = self.props.query.group?.map(({field}) => field);
                 headers = headers.concat(self.props.query.aggregation?.map(({field}) => field));
                 //results.push(headers);
@@ -40,23 +41,24 @@ export default class PivotWrap extends React.Component {
                     let row = {};
                     headers.forEach((header, idx) => {
                         let col_schema = self.props.schema.filter(column => column.name===header)[0];    
+                        const label = col_schema.label || col_schema.name;
                         if ( col_schema && col_schema.subtype) {
                             switch (col_schema.subtype) {
                                 case "quarter" :
-                                    row[header] = `Q${values[idx]}`; break;
+                                    row[label] = `Q${values[idx]}`; break;
                                 case "half" :
-                                    row[header] = `H${values[idx]}`; break;           
+                                    row[label] = `H${values[idx]}`; break;           
                                 case "day" : {
                                     var dayOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                                    row[header] = dayOfWeek[values[idx]-1];            
+                                    row[label] = dayOfWeek[values[idx]-1];            
                                     break;
                                 }
                                 default : 
-                                    row[header] = values[idx];
+                                    row[label] = values[idx];
                             }
                         }
                         else {
-                            row[header] = values[idx];
+                            row[label] = values[idx];
                         }
 
                     });
@@ -124,7 +126,7 @@ export default class PivotWrap extends React.Component {
                 cols = {this.props.cols.map(({label}) => label)}
                 aggregatorName={this.state.aggregator}
                 //aggregators= {Object.assign({}, Aggregators)}
-                vals={[this.props.query?.aggregation && this.props.query?.aggregation[0]?.field]}
+                vals={[this.props.query?.aggregation && this.props.query?.aggregation[0]?.fieldSchema?.label]}
                 rendererName={this.props.rendererName}
                 handlePivotClick={this.props.handlePivotClick}
                 //renderers={Object.assign({}, TableRenderers, PlotlyRenderers)}

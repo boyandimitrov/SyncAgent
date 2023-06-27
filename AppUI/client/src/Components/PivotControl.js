@@ -1,5 +1,5 @@
 import React from 'react';
-import {Tabs, Row, Col, Divider} from 'antd';
+import {Tabs, Row, Col, Divider, Button} from 'antd';
 import axios from "axios";
 import PivotGrid from './PivotGrid';
 import PivotPivot from './PivotPivot';
@@ -98,12 +98,18 @@ export default class Pivot extends React.Component {
     }   
 
     render(){
+        const self = this;
         return (
+            <div>
             <Tabs type="card" onTabClick={this.handleTabClick} items={
             [
                 { label: 'Grid', key: 'grid', children: <PivotGrid dataSource={this.state.data} fields={this.props.fields} schema={this.props.schema} loading={this.state.loading} pagination={this.state.tableParams.pagination} handleTableChange={this.handleTableChange}/> }, // remember to pass the key prop
                 { label: 'Pivot', key: 'pivot', children: <PivotPivot ds={this.props.ds} data={this.state.pivot_data}  fields={this.props.fields} schema={this.props.schema} filter={this.props.filter} cbSelectionCreated={this.props.cbSelectionCreated} /> },
             ]} />
+            {this.props.showClose  && (
+                <Button style={{ position: 'absolute', right: 20, top: 3 }} onClick={s => self.props.cbSubClosed(true)} >Close</Button> 
+            )}
+            </div>
         );
     }
 }
