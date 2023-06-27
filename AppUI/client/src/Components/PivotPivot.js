@@ -46,10 +46,10 @@ export default class PivotPivot extends React.Component {
             details : [],
             distincts : [],
             rendererName : 'Table',
-            options : (this.props.schema || []).map(({name, type}) => {
+            options : (this.props.schema || []).map(({name, type, label}) => {
 
                 return {
-                    label: (name && name.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())),
+                    label: label || name,
                     value: name
                 }
             }),
@@ -57,9 +57,9 @@ export default class PivotPivot extends React.Component {
                 .filter(item => {
                     return item.subtype === 'year'                    
                 })
-                .map(({name, type}) => {
+                .map(({name, type, label}) => {
                     return {
-                        label: (name && name.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())),
+                        label: label || name,
                         value: name
                     }
                 }),
@@ -195,11 +195,14 @@ export default class PivotPivot extends React.Component {
             }
         ]
 
+        debugger
         this.getDistinctData();
         this.setState({
             query : query, 
-            rows : (this.aggregation.abscissa || []).map(({value}) => value), 
-            cols : (this.aggregation.ordinate || []).map(({value}) => value)
+            // rows : (this.aggregation.abscissa || []).map(({value}) => value), 
+            // cols : (this.aggregation.ordinate || []).map(({value}) => value)
+            rows : (this.aggregation.abscissa || []), 
+            cols : (this.aggregation.ordinate || [])
         })
     }
 

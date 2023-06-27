@@ -114,13 +114,14 @@ export default class PivotWrap extends React.Component {
 
     render(){
         let self = this;
-        return (
+        debugger
 
+        return (
             <PivotTableUI
                 data={this.state.data || []}
                 //rows = {[]}
-                rows = {this.props.rows}
-                cols = {this.props.cols}
+                rows = {this.props.rows.map(({label}) => label)}
+                cols = {this.props.cols.map(({label}) => label)}
                 aggregatorName={this.state.aggregator}
                 //aggregators= {Object.assign({}, Aggregators)}
                 vals={[this.props.query?.aggregation && this.props.query?.aggregation[0]?.field]}
