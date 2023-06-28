@@ -11,6 +11,7 @@ export default class Pivot extends React.Component {
             loading:false,
             data : [] ,
             pivot_data : [],
+            closed : false,
             tableParams : {
                 pagination : {
                     current: 1,
@@ -20,10 +21,15 @@ export default class Pivot extends React.Component {
         };
 
         this.cbSelectionCreated = this.cbSelectionCreated.bind(this);
+        this.cbSubClosed = this.cbSubClosed.bind(this);
     }
 
     cbSelectionCreated(filter, aggregation) { 
-        this.setState({filter: filter, aggregation:aggregation})
+        this.setState({filter: filter, aggregation:aggregation, closed:false})
+    }
+
+    cbSubClosed (value) {
+        this.setState({closed:value});
     }
 
     renderSub() {
@@ -36,6 +42,8 @@ export default class Pivot extends React.Component {
                 fields={this.props.fields} 
                 schema={this.props.schema} 
                 ds = {this.props.ds}
+                showClose = {true}
+                cbSubClosed={this.cbSubClosed}
                 filter={this.state.filter} 
                 //aggregation={this.state.aggregation}
             />
@@ -44,8 +52,8 @@ export default class Pivot extends React.Component {
 
     render(){
 
-        const span = this.state.filter ? 11 : 24;
-        const clsDisplay = this.state.filter ? '' : "hidden";
+        const span = this.state.filter && !this.state.closed ? 11 : 24;
+        const clsDisplay = this.state.filter && !this.state.closed ? '' : "hidden";
 
         return (
             <Row>
