@@ -16,6 +16,7 @@ const schema = [
     {"name":"transaction_status","type":"string","mode":"nullable", label : "Статус"},
     {"name":"transaction_created_master","type":"timestamp","mode":"nullable", label : "Дата"},
     {"name":"transactionLines_price","type":"NUMERIC", label : "Цена"},
+    {"name":"transactionLines_profit","type":"NUMERIC", label : "Приход"},
     {"name":"transactionLines_quantityType","type":"string", label : "Тип"},
     {"name":"transactionLines_quantityValue","type":"NUMERIC","mode":"nullable", label : "Количества"},
     {"name":"transaction_created_year","type":"int64","system":true, subtype: "year", label : "Транзакция (година)"},

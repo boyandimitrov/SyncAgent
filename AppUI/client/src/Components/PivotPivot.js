@@ -313,7 +313,7 @@ export default class PivotPivot extends React.Component {
 
         const schema = this.props.schema;
         let distincts = {};
-        let groups = this.aggregation.abscissa.concat(this.aggregation.ordinate);
+        let groups = (this.aggregation.abscissa || []).concat(this.aggregation.ordinate || []);
         groups.forEach(group => {
             let col_schema = schema.filter(column => column.name===group.value)[0];    
             if ( col_schema?.distinct ) {
