@@ -1,0 +1,23 @@
+
+[
+    {
+        "name" : "id",
+        "type" : "string"
+    },
+    {
+        "name" : "name",
+        "type" : "string"
+    },
+    {
+        "name" : "fk_manufacturer",
+        "type" : "string"
+    },
+    {
+        "name" : "percent",
+        "type" : "float64"
+    },
+    {
+        "name" : "timestamp",
+        "type" : "timestamp"
+    }
+]

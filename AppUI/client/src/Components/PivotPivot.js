@@ -212,7 +212,7 @@ export default class PivotPivot extends React.Component {
             }
         ]
 
-        debugger
+        //debugger
         this.getDistinctData();
         this.setState({
             query : query, 
@@ -282,7 +282,7 @@ export default class PivotPivot extends React.Component {
     }
 
     handleDistinctsChanged(ranges, label) {
-        debugger
+        //debugger
         console.log(`Select control ${label} changed. Selected values:`, ranges);
         if ( !this.aggregation.distincts ) {
             this.aggregation.distincts = {};

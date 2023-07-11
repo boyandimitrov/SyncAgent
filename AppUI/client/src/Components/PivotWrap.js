@@ -2,24 +2,34 @@ import React from 'react';
 import axios from "axios";
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import TableRenderers from "react-pivottable/TableRenderers";
+import {locales} from 'react-pivottable/Utilities';
 //import Plot from 'react-plotly.js';
 //import createPlotlyRenderers from "react-pivottable/PlotlyRenderers";
 
+console.log(locales);
+
+debugger
 export default class PivotWrap extends React.Component {
     constructor(props) {
         super(props);
 
+        let myLocale = Object.assign({}, locales.en);
         let aggregator;
         if (this.props.query?.aggregation && this.props.query?.aggregation[0]?.gridFormula) {
-            aggregator = this.props.query.aggregation[0].gridFormula;
+            const aggregation = this.props.query.aggregation[0];
+            aggregator = aggregation.gridFormula;
             if ( aggregator === 'Count') {
                 aggregator = 'Integer Sum';
             }
+
+            debugger
+            myLocale.localeStrings["totals"] =  aggregation.fieldSchema.label;
         }
 
         this.state = {
             data : this.props.data || [],
-            aggregator : aggregator
+            aggregator : aggregator,
+            locale: myLocale
         };
     }
 
@@ -29,7 +39,7 @@ export default class PivotWrap extends React.Component {
         axios
             .post(`${process.env.REACT_APP_BASE_URL}/aggregate`, this.props.query)
             .then((response) => {
-                debugger
+                //debugger
                 let headers = self.props.query.group?.map(({field}) => field);
                 headers = headers.concat(self.props.query.aggregation?.map(({field}) => field));
                 //results.push(headers);
@@ -116,7 +126,7 @@ export default class PivotWrap extends React.Component {
 
     render(){
         let self = this;
-        debugger
+        //debugger
 
         return (
             <PivotTableUI

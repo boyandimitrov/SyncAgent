@@ -1,4 +1,4 @@
-[
+[    
     {
         "source" : "fb",
         "target" : "bq",
@@ -52,6 +52,12 @@
                         "bq_type": "FLOAT64"
                     },
                     {
+                        "fb_column": "profit",
+                        "fb_type": "float",
+                        "bq_column": "profit",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
                         "fb_column": "updated",
                         "fb_type": "integer",
                         "bq_column": "updated",
@@ -93,6 +99,19 @@
                                 "fb_column" : "id",
                                 "fb_type" : "string",
                                 "bq_column" : "fk_store",
+                                "bq_type" : "string"
+                            }
+                        ]
+                    },
+                    {
+                        "fb_column" : "product",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_simple",
+                        "fk" : [
+                            {
+                                "fb_column" : "id",
+                                "fb_type" : "string",
+                                "bq_column" : "fk_distributor_store",
                                 "bq_type" : "string"
                             }
                         ]

@@ -37,6 +37,14 @@
         "type" : "string"
     },
     {
+        "name" : "fk_promotion",
+        "type" : "string"
+    },
+    {
+        "name" : "discount",
+        "type" : "float64"
+    },
+    {
         "name" : "fk_transaction",
         "type" : "string"
     },

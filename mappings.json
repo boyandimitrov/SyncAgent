@@ -34,6 +34,12 @@
                         "bq_type": "BOOL"
                     },
                     {
+                        "fb_column": "discount",
+                        "fb_type": "float",
+                        "bq_column": "discount",
+                        "bq_type": "FLOAT64"
+                    },
+                    {
                         "fb_column": "price",
                         "fb_type": "float",
                         "bq_column": "price",
@@ -99,6 +105,19 @@
                                 "fb_column" : "id",
                                 "fb_type" : "string",
                                 "bq_column" : "fk_store",
+                                "bq_type" : "string"
+                            }
+                        ]
+                    },
+                    {
+                        "fb_column" : "product",
+                        "fb_type" : "object",
+                        "strategy" : "foreign_key_simple",
+                        "fk" : [
+                            {
+                                "fb_column" : "id",
+                                "fb_type" : "string",
+                                "bq_column" : "fk_promotion",
                                 "bq_type" : "string"
                             }
                         ]

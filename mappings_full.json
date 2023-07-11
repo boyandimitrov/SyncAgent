@@ -22,6 +22,32 @@
         ]
     },
     {
+        "es": "system",
+        "bq": "promotion",
+        "mapping": [
+            {
+                "bq_column": "id",
+                "bq_type": "STRING"
+            },
+            {
+                "bq_column": "name",
+                "bq_type": "STRING"
+            },
+            {
+                "bq_column": "fk_manufacturer",
+                "bq_type": "STRING"
+            },
+            {
+                "bq_column": "percent",
+                "bq_type": "float64"
+            },
+            {
+                "bq_column": "timestamp",
+                "bq_type": "TIMESTAMP"
+            }
+        ]
+    },    
+    {
         "source" : "es",
         "target" : "bq",
         "es": "promoto-area_v2",

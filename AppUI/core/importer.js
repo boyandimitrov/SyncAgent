@@ -110,14 +110,23 @@ const fake_transaction = (items_count=1000, tables = {}) => {
     return items;
 }
 
+function get_promotion(tables) {
+    const randomInt = faker.number({min:1, max:100});
+
+    if ( randomInt <= 5) {
+        return 
+    }
+    return null;
+}
+
 const fake_transaction_lines = (items_count=1000, tables = {}) => {
     let items = [];
 
     for (let i=0; i< items_count; i++ ) {
         let item = {
+            inPromotion : false,
             code : get_value({fobj: "random", ffunc : "alpha", fparam : {length: 8, casing: 'upper'}}),
             created : get_value({fobj: "date", ffunc : "past"}),
-            inPromotion	: get_value({fobj: "datatype", ffunc : "boolean", fparam : { probability: 0.1 }}),
             price : get_value({fobj: "commerce", ffunc : "price", fparam : 0, sparam:100}),
             quantityType : get_value({farr : ["count", "kgs"], fobj: "datatype", ffunc : "number", fparam : { min:0, max: 1 }}),
             quantityValue : get_value({fobj: "datatype", ffunc : "number", fparam : { min:0, max: 100 }}),
@@ -132,7 +141,20 @@ const fake_transaction_lines = (items_count=1000, tables = {}) => {
             id : get_value({fobj: "datatype", ffunc : "uuid"}),
         };
 
-        item.profit = get_value({fobj: "datatype", ffunc : "number", fparam : { min:10, max: 50 }, iparam : { multiply : (parseFloat(item.price) / 100)} }),
+        item.profit = get_value({fobj: "datatype", ffunc : "number", fparam : { min:10, max: 50 }, iparam : { multiply : (parseFloat(item.price) / 100)} });
+
+        if ( i % 100 <= 5 ) {
+            item.inPromotion = true
+            const promotion = get_item_from_table(tables,"promotion");
+            item.fk_promotion = promotion.id;
+
+            if ( i % 10 === 3) {
+                item.discount = (i % 5) * 4;
+            }
+            else {
+                item.discount = promotion.percent;
+            }
+        }
 
         items.push(item);
     }
@@ -148,6 +170,7 @@ const fake = async () => {
         view : "transaction"
     }
     let tables = await db.load_tables(foreign_tables, {dataset : "Mall"});
+    let promotions = await db.load_tables(["promotion"], {dataset : "Mall", fields : ["id", "percent"]});
     let arrays = {
         "distributor_store" : {
             count : 4,
@@ -163,7 +186,7 @@ const fake = async () => {
         }
     }
 
-    tables = { ...tables, ...arrays };
+    tables = { ...tables, ...promotions, ...arrays };
 
     tables["transaction"] = {
         rows: []
@@ -199,6 +222,59 @@ const fake = async () => {
     while ( items_count > 0);
 }
 
+const fake_promotions = async () => {
+    let input = {
+        dataset : "Mall",
+        table : "promotion",
+        view : "promotion"
+    }
+
+    let promotions = {
+        "promotion" : {
+            count : 5,
+            rows : [
+                {
+                    "id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+                    "name" : "2 в 1",
+                    "fk_manufacturer" : "5675735d-90a9-46da-88f2-21cd9af351d5",
+                    "percent" : 10,
+                    "timestamp" : new Date().toISOString()
+                }, 
+                {
+                    "id": "3d577e73-8557-44a1-8b79-3c2f5259e37f",
+                    "name" : "Месо и месни",
+                    "fk_manufacturer" : "b2f0f18d-f910-4c8c-8d23-6611532bf82d",
+                    "percent" : 14,
+                    "timestamp" : new Date().toISOString()
+                }, 
+                {
+                    "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+                    "name" : "Always Coca Cola",
+                    "fk_manufacturer" : "5675735d-90a9-46da-88f2-21cd9af351d5",
+                    "percent" : 25,
+                    "timestamp" : new Date().toISOString()
+                }, 
+                {
+                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "name" : "Девин от извора",
+                    "fk_manufacturer" : "99b562b0-15e2-42ed-898e-d0ad163a4c2f",
+                    "percent" : 10,
+                    "timestamp" : new Date().toISOString()
+                }, 
+                {
+                    "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                    "name" : "Чиста вода, много пари",
+                    "fk_manufacturer" : "99b562b0-15e2-42ed-898e-d0ad163a4c2f",
+                    "percent" : 5,
+                    "timestamp" : new Date().toISOString()
+                }]
+        }
+    }
+
+    await db.import_rows(promotions.promotion.rows, input);
+
+}
+
 module.exports = {
-    fake, get_item_from_table
+    fake, get_item_from_table, fake_promotions
 }
