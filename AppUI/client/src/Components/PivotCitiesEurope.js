@@ -1,12 +1,13 @@
 import React from 'react';
 import axios from "axios";
-import {select, json, geoPath, geoAlbersUsa, scaleQuantize, schemePurples, min, max} from 'd3';
+import {select, json, geoPath, geoMercator, scaleQuantize, schemePurples, min, max} from 'd3';
 import * as topojson from "topojson-client";
-import us from "../usState.json";
+import cities from 'cities.json';
 
 const app_class = 'main-application';
-class PivotMap extends React.Component {
-    
+
+class PivotCitiesEurope extends React.Component {
+
     constructor(props) {
         super(props);
         this.myRef = React.createRef(); 
@@ -24,9 +25,7 @@ class PivotMap extends React.Component {
             .then((response) => {
                 let headers = self.props.query.group?.map(({field}) => field);
                 headers = headers.concat(self.props.query.aggregation?.map(({field}) => field));
-                //results.push(headers);
 
-                //debugger
                 let rows = [];
                 response.data.results.forEach(item => {
                     let values = item.group.concat(item.value);
@@ -57,7 +56,7 @@ class PivotMap extends React.Component {
                     rows.push(row)
                 })
 
-                let states_values = rows.reduce((accumulator, current) => {
+                let cities_values = rows.reduce((accumulator, current) => {
                     accumulator[current[self.props.state]] = current[self.props.value];
                     return accumulator;
                 }, {})
@@ -68,7 +67,7 @@ class PivotMap extends React.Component {
                         //.text('Hello from D3')
                         .attr('class', app_class);
         
-                        this.renderSVG( states_values);
+                        this.renderSVG( cities_values);
                     }
             });
     }
@@ -85,19 +84,58 @@ class PivotMap extends React.Component {
         }
     }
 
+    renderCircles(svg, projection, cities, colorScale) {
+        // let t = tip()
+        //     .attr('class', 'd3-tip')
+        //     .offset([-10, 0])
+        //     .html(function(d) {
+        //         return d.name;
+        //     });
+        let self = this;
+
+        let circleGroup = svg.selectAll('circle')
+            .data(cities)
+            .enter()
+        .append('g')
+        .attr('transform', function(d) {
+          return 'translate('+ projection([d.lng, d.lat])+')';
+            })
+        .attr('class', 'city')
+        .on("click", (event, d) => {
+            self.props.cbSelectionCreated({[self.props.state] : d.name})
+        }); 
+    
+      circleGroup
+        .append('circle')
+        .style('fill', d => colorScale(d.aggr))
+        .style("stroke", "grey")
+        .style('fill-opacity', .8)
+            .attr('r', function (d) {
+              return d.aggr ? d.aggr * 0.02 : 0;
+            })
+        // .on('mouseover', t.show)
+        // .on('mouseout', t.hide)
+        .append('title')
+        .text(function(d) {
+            return d.name;
+        //   return d.name+ ' -'+
+        //   '\nMurders: '+d.murder+' ('+Math.round(d.murder_rate)+' for every 100k),'+
+        //   '\n2015 Population: '+ d.pop_2015;
+        });
+    }
+
     renderSVG(data) {
 
         const self = this;
         const width = 960;
         const height = 560;
         
-        const states = JSON.parse(JSON.stringify(us));
+        //const states = JSON.parse(JSON.stringify(us));
 
-        json("https://unpkg.com/us-atlas@3.0.0/states-10m.json")
-             .then (usa => {
+        json("https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json")
+             .then (euData => {
                 //const states = topojson.feature(usa, usa.objects.states).features;
-                debugger
-                const projection = geoAlbersUsa().fitSize([width, height], states);
+                const projection = geoMercator().fitSize([width, height], euData);
                 const path = geoPath().projection(projection);
                 
                 const svg = select(`.${app_class}`).append("svg").attr("viewBox", [0, 0, 975, 610]);
@@ -105,22 +143,16 @@ class PivotMap extends React.Component {
 
                 let value = null;
                 svg
-                    .selectAll(".state")
-                    .data(states.features)
+                    .selectAll(".country")
+                    .data(euData.features)
                     .join("path")
                     .attr("d", path)
-                    .on("click", (event, d) => {
-                        const node = svg.node();
-                        node.value = value = value === d.properties.NAME ? null : d.properties.NAME;
-                        node.dispatchEvent(new Event("input", {bubbles: true}));
-                        outline.attr("d", value ? path(d) : null);
-                        self.props.cbSelectionCreated({[self.props.state] : d.properties[self.props.nomenclature]})
-                    })            
                     .attr("class", "state")
                     .style("fill", function(d) {
-                        const value = data[d.properties[self.props.nomenclature]];
+                        return "#ccc";
+                        const value = data[d.properties.STUSPS];
                         if (value) {
-                            return colorScale(value);
+                            //return colorScale(value);
                         } else {
                             return "#ccc";
                         }
@@ -128,30 +160,17 @@ class PivotMap extends React.Component {
                     .attr("fill-opacity", 1);
                     //.attr("stroke", "black");
 
-            const labels = svg.append("g").attr("id", "labels") // setup a container <g> node to hold all the labels
-            labels.selectAll("text")
-                .data(states.features)                       // we're still working with the same geographic data
-                .join('text')                                     // we want to add a <text> SVG node for each state
-                .attr('text-anchor', 'middle')                  // style it up a little bit to look reasonable and readable
-                .attr('fill', 'grey')
-                .text(d => d.properties[self.props.nomenclature])
-                .attr('x', d => path.centroid(d)[0])
-                .attr('y', d => path.centroid(d)[1])
+                let new_cities = [];
+                let eu_cities = cities.filter(({country}) => country === "EU");
+                eu_cities.forEach(city => {
+                    if ( data[city.name] ) {
+                        let new_city = Object.assign({}, city);
+                        new_city.aggr = data[city.name];
+                        new_cities.push(new_city);
+                    }
+                })
 
-            svg.append("path")
-                .datum(topojson.mesh(usa, usa.objects.states, (a, b) => a !== b))
-                .attr("fill", "none")
-                .attr("stroke", "white")
-                .attr("stroke-linejoin", "round")
-                .attr("pointer-events", "none")
-                .attr("d", path);            
-
-
-            const outline = svg.append("path")
-                .attr("fill", "none")
-                .attr("stroke", "black")
-                .attr("stroke-linejoin", "round")
-                .attr("pointer-events", "none");         
+                this.renderCircles(svg, projection, new_cities, colorScale)
         })   
     }
 
@@ -163,4 +182,4 @@ class PivotMap extends React.Component {
     }
 }
 
-export default PivotMap;
+export default PivotCitiesEurope;

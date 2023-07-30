@@ -4,11 +4,12 @@ import axios from "axios";
 import {Collapse, Layout, Select, Radio, Row, Col } from 'antd';
 import PivotWrap from './PivotWrap';
 import PivotMap from './PivotMap';
-import PivotCities from './PivotCities';
+import PivotCities from './PivotCitiesEurope';
+// import PivotCities from './PivotCities';
 import PivotBar from './PivotBar';
-import PivotTableUI from 'react-pivottable/PivotTableUI';
-import TableRenderers from "react-pivottable/TableRenderers";
-import { disconnect } from 'process';
+// import PivotTableUI from 'react-pivottable/PivotTableUI';
+// import TableRenderers from "react-pivottable/TableRenderers";
+// import { disconnect } from 'process';
 //import Plot from 'react-plotly.js';
 //import createPlotlyRenderers from "react-pivottable/PlotlyRenderers";
 

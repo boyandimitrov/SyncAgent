@@ -1,6 +1,5 @@
 const {BigQuery} = require('@google-cloud/bigquery');
 const {logical_schema} = require('./logical_schema.js');
-const { param } = require('./router.js');
 
 const bigquery = new BigQuery({
     projectId: process.env.BQ_ID,

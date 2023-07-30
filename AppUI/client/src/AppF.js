@@ -24,7 +24,7 @@ const schema = [
     {"name":"transaction_created_month","type":"int64","system":true, subtype: "month", label : "Транзакция (месец)"},
     {"name" : "categories0_name_bg", "type" : "string", "distinct" : {"table" : "VIEW", "field" : "categories0_name_bg"}, label : "Категория (главна)"},
     {"name" : "distributor_name", "type" : "string", label : "Дистрибутор"},
-    {"name" : "shop_city_name_bg", "type" : "string", label : "Магазин (град)"},
+    {"name" : "shop_city_name_bg", "type" : "string", label : "Магазин (град)", subtype: "city"},
     {"name" : "shop_area_name_bg", "type" : "string", label : "Магазин (община)"},
     {"name" : "manufacturer_name", "type" : "string", label : "Производител"},
     {"name" : "store_name", "type" : "string", label : "Склад"},
