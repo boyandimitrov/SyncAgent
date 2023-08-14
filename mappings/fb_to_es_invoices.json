@@ -1,0 +1,46 @@
+{
+    "target" : "es",
+    "mappings" : [    
+        {
+            "source" : "fb",
+            "target" : "es",
+            "fb" : "invoice_1",
+            "es" : "invoice",
+            "sync_batch_size" : 10,
+            "sync_column" : "created",
+            "id_column" : "id",
+            "mapping" : [
+                {
+                    "src_column" : "id",
+                    "src_type" : "string",
+                    "trgt_column" : "id",
+                    "trgt_type" : "STRING"
+                },
+                {
+                    "src_column" : "created",
+                    "src_type" : "integer",
+                    "trgt_column" : "date_created",
+                    "trgt_type" : "DATE"
+                },
+                {
+                    "src_column" : "created",
+                    "src_type" : "integer",
+                    "trgt_column" : "date_updated",
+                    "trgt_type" : "DATE"
+                },
+                {
+                    "src_column" : "invoiceNumber",
+                    "src_type" : "string",
+                    "trgt_column" : "identifier",
+                    "trgt_type" : "STRING"
+                },
+                {
+                    "src_column" : "products",
+                    "src_type" : "object",
+                    "trgt_column" : "products",
+                    "trgt_type" : "OBJECT"
+                }
+            ]
+        }
+    ]
+}

@@ -1,8 +1,7 @@
 require('dotenv').config();
 
-const mappings = require('./mappings.json');
+const {target, mappings} = require('./mappings/fb_to_es_invoices.json');
 
-const bq = require('./src/sources/bq');
 const SyncManager = require('./src/sync');
 
 const syncManager = new SyncManager();
@@ -17,8 +16,8 @@ async function updateSync() {
 }
 
 async function initSync() {
-    await bq.createSchema(mappings);
-    console.log("BQ schema created");
+    await syncManager.createSchema(mappings, target);
+    console.log("Schema created");
 }
 
 initSync()

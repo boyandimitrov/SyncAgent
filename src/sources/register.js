@@ -15,6 +15,12 @@ const OutputDataSources = {
     bq: {
         getLastSyncRecord: bigquery.getLastSyncRecord,
         insertRows: bigquery.insertRows,
+        createSchema : bigquery.createSchema
+    },
+    es: {
+        getLastSyncRecord: elastic.getLastSyncRecord,
+        insertRows: elastic.insertRows,
+        createSchema : elastic.createSchema
     }
 };
 

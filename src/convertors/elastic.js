@@ -3,17 +3,17 @@ const {transformers} = require('../transformers');
 const importer = require("../../AppUI/core/importer")
 
 function processField(obj, field, id, callback) {
-    if (obj && obj[field.es_column]) {
-        return callback(obj[field.es_column], field, id);
+    if (obj && obj[field.src_column]) {
+        return callback(obj[field.src_column], field, id);
     } else {
-        console.log(`${id} has missing value for ${field.es_type}`);
+        console.log(`${id} has missing value for ${field.src_type}`);
         return null;
     }
 }
 
 function strategyFlatten(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const result = parseObject(obj[field.es_column], field.flatten, id);
+        const result = parseObject(obj[field.src_column], field.flatten, id);
         if (result?.value !== null && typeof result?.value !== 'undefined') {
             return result.value;
         }
@@ -22,7 +22,7 @@ function strategyFlatten(obj, field, id) {
 
 function strategyForeignKeySimple(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const result = parseObject(obj[field.es_column], field.fk, id);
+        const result = parseObject(obj[field.src_column], field.fk, id);
         if (result?.value !== null && typeof result?.value !== 'undefined') {
             return result.value;
         }
@@ -35,57 +35,57 @@ function strategyFaker(obj, field, id, ctx) {
         const result = importer.get_item_from_table(ctx.fakers, fk_schema.faker_type);
 
         if (result !== null && typeof result !== 'undefined') {
-            return {[fk_schema.bq_column] : result[fk_schema.faker_column]};
+            return {[fk_schema.trgt_column] : result[fk_schema.faker_column]};
         }
     });
 }
 
 function strategyForeignKeyType(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const fk_obj = obj[field.es_column];
+        const fk_obj = obj[field.src_column];
         const fk_schema = field.fk[0];
 
-        const type = fk_obj[fk_schema.es_type_column];
+        const type = fk_obj[fk_schema.src_type_column];
 
-        if (!(fk_schema.es_types || []).includes(type)) {
+        if (!(fk_schema.src_types || []).includes(type)) {
             console.error("unsupported type");
             return null;
         }
 
-        let result = fk_obj[fk_schema.es_column];
+        let result = fk_obj[fk_schema.src_column];
         if (result !== null && typeof result !== 'undefined') {
-            return {[fk_schema.bq_column + type] : result};
+            return {[fk_schema.trgtcolumn + type] : result};
         }
     });
 }
 
 function strategyForeignKeyValueArray(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const fk_obj = obj[field.es_column];
+        const fk_obj = obj[field.src_column];
         const fk_schema = field.fk[0];
 
         let bridge_rows = [] ;
         for ( let arr_val of fk_obj ) {
             let row = {
-                [fk_schema.bq_primary] : id, 
-                [fk_schema.bq_column] : arr_val 
+                [fk_schema.trgt_primary] : id, 
+                [fk_schema.trgt_column] : arr_val 
             }
 
-            if ( fk_schema.bq_id_type) {
-                row[fk_schema.bq_type_column] = fk_schema.bq_id_type;
+            if ( fk_schema.trgt_id_type) {
+                row[fk_schema.trgt_type_column] = fk_schema.trgt_id_type;
             }
 
             bridge_rows.push(row);
         }
 
-        let bridge = {[fk_schema.bq_bridge] : bridge_rows}
+        let bridge = {[fk_schema.trgt_bridge] : bridge_rows}
         return { value: {}, bridgeValue : bridge};        
     });
 }
 
 function strategyForeignKeyArrayLast(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const fk_obj = obj[field.es_column] || [];
+        const fk_obj = obj[field.src_column] || [];
         if ( !fk_obj.length ) {
             return {};
         }
@@ -93,13 +93,13 @@ function strategyForeignKeyArrayLast(obj, field, id) {
         const fk_schema = field.fk[0];
 
         let lastElement = fk_obj[fk_obj.length-1];
-        return {[fk_schema.bq_column] : lastElement[fk_schema.es_column]};
+        return {[fk_schema.trgt_column] : lastElement[fk_schema.src_column]};
     });
 }
 
 function strategyForeignKeyArrayIndex(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const fk_obj = obj[field.es_column] || [];
+        const fk_obj = obj[field.src_column] || [];
         if ( !fk_obj.length ) {
             return {};
         }
@@ -108,7 +108,7 @@ function strategyForeignKeyArrayIndex(obj, field, id) {
 
         let lastElement = fk_obj[field.index];
         if (lastElement) {
-            return {[fk_schema.bq_column] : lastElement[fk_schema.es_column]};
+            return {[fk_schema.trgt_column] : lastElement[fk_schema.src_column]};
         }
         return {};
     });
@@ -116,48 +116,48 @@ function strategyForeignKeyArrayIndex(obj, field, id) {
 
 function strategyForeignKeyBridge(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const fk_objs = obj[field.es_column] || [];
+        const fk_objs = obj[field.src_column] || [];
         const fk_schema = field.fk[0];
 
         let bridge_rows = [] ;
         fk_objs.forEach(fk_obj => {
             bridge_rows.push({
-                [fk_schema.bq_primary] : id, 
-                [fk_schema.bq_column] : fk_obj[fk_schema.es_column] 
+                [fk_schema.trgt_primary] : id, 
+                [fk_schema.trgt_column] : fk_obj[fk_schema.src_column] 
             })
         })
-        let bridge = {[fk_schema.bq_bridge] : bridge_rows}
+        let bridge = {[fk_schema.trgt_bridge] : bridge_rows}
         return { value: {}, bridgeValue : bridge};
     });
 }
 
 function strategyForeignKeyLookup(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const fk_objs = obj[field.es_column] || [];
+        const fk_objs = obj[field.src_column] || [];
         const fk_schema = field.fk[0];
 
         let bridge_rows = [] ;
         fk_objs.forEach(fk_obj => {
             bridge_rows.push({
                 id : uuidv4(), 
-                [fk_schema.bq_column] : id,
-                [fk_schema.bq_column_value] : fk_obj[fk_schema.es_column]
+                [fk_schema.trgt_column] : id,
+                [fk_schema.trgt_column_value] : fk_obj[fk_schema.trgt_column]
             })
         })
-        let bridge = {[fk_schema.bq_bridge] : bridge_rows}
+        let bridge = {[fk_schema.trgt_bridge] : bridge_rows}
         return { value: {}, bridgeValue : bridge};
     });
 }
 
 function strategyDefault(obj, field, id) {
     try {
-        let value = obj[field.es_column];
+        let value = obj[field.src_column];
         const transformer = field.transformer;
         if (transformer && transformers[transformer]) {
             value = transformers[transformer](value, field);
         }
-        if ( field.bq_type !== 'CUSTOM') {
-            return {[field.bq_column] : value};
+        if ( field.trgt_type !== 'CUSTOM') {
+            return {[field.trgt_column] : value};
         }
         else {
             return value;

@@ -2,23 +2,23 @@ const safeEval = require('safe-eval');
 const {transformers} = require('../transformers');
 
 function processField(obj, field, id, callback) {
-    if (obj && obj[field.fb_column]) {
-        return callback(obj[field.fb_column], field, id);
+    if (obj && obj[field.src_column]) {
+        return callback(obj[field.src_column], field, id);
     } else {
-        console.log(`${id} has missing value for ${field.fb_type}`);
+        console.log(`${id} has missing value for ${field.src_type}`);
         return null;
     }
 }
 
 function strategyDefault(obj, field, id) {
     try {
-        let value = obj[field.fb_column];
+        let value = obj[field.src_column];
         const transformer = field.transformer;
         if (transformer && transformers[transformer]) {
             value = transformers[transformer](value, field);
         }
-        if ( field.bq_type !== 'CUSTOM') {
-            return {[field.bq_column] : value};
+        if ( value && field.trgt_type !== 'CUSTOM') {
+            return {[field.trgt_column] : value};
         }
         else {
             return value;
@@ -37,7 +37,7 @@ function strategyFormula(obj, field, id) {
     try {
         // Create a context object with values of necessary fields
         let context = {};
-        for (let column of field.fb_columns) {
+        for (let column of field.src_columns) {
             context[column] = obj[column] || false;
         }
   
@@ -57,7 +57,7 @@ function strategyFormula(obj, field, id) {
     }
   
     // Convert to BigQuery suitable structure
-    return {[field.bq_column] : value};
+    return {[field.trgt_column] : value};
 }
   
 function strategyForeignTable(obj, field, id, mapping) {
@@ -65,8 +65,8 @@ function strategyForeignTable(obj, field, id, mapping) {
     // "fb_type" : "array",
     // "strategy" : "foreign_table",
     // "fb_table" : "transactionLines"
-    const fk_rows = obj[field.fb_column] || [];
-    const fk_table_schema = mapping.bridges.filter(({bq}) => bq === field.fb_table)[0];
+    const fk_rows = obj[field.src_column] || [];
+    const fk_table_schema = mapping.bridges.filter(({trgt}) => trgt === field.trgt_table)[0];
 
     let bridgeRows = [];
     for ( let row of fk_rows ) {
@@ -77,13 +77,13 @@ function strategyForeignTable(obj, field, id, mapping) {
     
     }
 
-    let bridge = {[field.fb_table] : bridgeRows}
+    let bridge = {[field.src_table] : bridgeRows}
     return { value: {}, bridgeValue : bridge};
 }
 
 function strategyForeignKeySimple(obj, field, id) {
     return processField(obj, field, id, (value, field, id) => {
-        const result = parseObject(obj[field.fb_column], {mapping: field.fk}, id);
+        const result = parseObject(obj[field.src_column], {mapping: field.fk}, id);
         if (result?.value !== null && typeof result?.value !== 'undefined') {
             return result.value;
         }
@@ -91,7 +91,7 @@ function strategyForeignKeySimple(obj, field, id) {
 }
 
 function strategyForeignKeyParent(obj, field, id) {
-    return {[field.bq_column] : id};
+    return {[field.trgt_column] : id};
 }
 
 function mergeBridgeValues(bridgeValues) {

@@ -108,6 +108,10 @@ class SyncManager extends EventEmitter {
         });
     }
 
+    async createSchema(mappings, target) {
+        await OutputDataSources[target].createSchema(mappings);
+    }
+
     stopSync() {
         this.shouldContinueSync = false;
         this.emit('stopSync');
