@@ -59,6 +59,39 @@ function strategyFormula(obj, field, id) {
     // Convert to BigQuery suitable structure
     return {[field.trgt_column] : value};
 }
+
+function strategyAggregation(obj, field, id) {
+    let value = 0;
+  
+    try {
+
+        for ( let item of obj[field.src_column]) {
+            if ( field.aggregation === "sum_formula" ) {
+                let context = {};
+                for (let column of field.aggregation_columns) {
+                    context[column] = item[column] || 0;
+                }
+          
+                // Evaluate the formula
+                const agg_result = safeEval(field.aggregation_formula, context);
+                value += agg_result;
+            }
+        }
+    } 
+    catch (e) {
+        console.error(`Error evaluating formula for id ${id}: ${e.message}`);
+        return null;
+    }
+  
+    // Apply the transformer if it exists
+    const transformer = field.transformer;
+    if (transformer && transformers[transformer]) {
+        value = transformers[transformer](value, field);
+    }
+  
+    // Convert to BigQuery suitable structure
+    return {[field.trgt_column] : value};
+}
   
 function strategyForeignTable(obj, field, id, mapping) {
     // "fb_column" : "transactionLines",
@@ -117,6 +150,9 @@ function parseObject(obj, mapping, id) {
         switch (field.strategy) {
             case 'formula':
                 value = strategyFormula(obj, field, id);
+                break;
+            case 'aggregate':
+                value = strategyAggregation(obj, field, id);
                 break;
             case 'foreign_key_simple':
                 value = strategyForeignKeySimple(obj, field, id);

@@ -240,7 +240,8 @@
                         { "suffix" : "day", "bq_type" : "INT64" },
                         { "suffix" : "week",  "bq_type" : "INT64" }                    
                     ],
-                    "transformer" : "timestamp_to_smartdate"
+                    "transformer" : "timestamp_to_smartdate",
+                    "transformer_type" : "flat"
                 },
                 {
                     "fb_columns": ["updated", "created"],

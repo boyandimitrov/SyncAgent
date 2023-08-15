@@ -29,16 +29,33 @@
                     "trgt_type" : "DATE"
                 },
                 {
+                    "src_column": "created",
+                    "src_type": "integer",
+                    "trgt_column": "period",
+                    "trgt_type" : "CUSTOM",
+                    "derivatives" :[
+                        { "suffix" : "from", "trgt_type" : "TIMESTAMP" },
+                        { "suffix" : "to", "trgt_type" : "TIMESTAMP" }
+                    ],
+                    "transformer" : "timestamp_to_smartdate",
+                    "transformer_type" : "object"
+                },
+                {
                     "src_column" : "invoiceNumber",
                     "src_type" : "string",
-                    "trgt_column" : "identifier",
+                    "trgt_column" : "number",
                     "trgt_type" : "STRING"
                 },
                 {
-                    "src_column" : "products",
+                    "src_column" : "transactionLines",
                     "src_type" : "object",
-                    "trgt_column" : "products",
-                    "trgt_type" : "OBJECT"
+                    "strategy" : "aggregate",
+                    "aggregation" : "sum_formula",
+                    "aggregation_columns" : ["price", "quantityValue"],
+                    "aggregation_formula" : "price * quantityValue",
+                    "trgt_column" : "price",
+                    "trgt_type" : "OBJECT",
+                    "transformer" : "price_hardcoded_bgn"
                 }
             ]
         }

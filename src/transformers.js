@@ -29,6 +29,13 @@ const transformers_smartdate = {
         dUtc.setUTCDate(dUtc.getUTCDate() + 4 - dayNum);
         let yearStart = new Date(Date.UTC(dUtc.getUTCFullYear(),0,1));
         return Math.ceil((((dUtc - yearStart) / 86400000) + 1)/7)
+    },
+    from : function(d) {
+        return d.setUTCHours(0, 0, 0, 0);
+    },
+    to : function(d) {
+        d.setUTCHours(0, 0, 0, 0);
+        return d.setDate(d.getDate() + 1);
     }
 }
 
@@ -64,7 +71,7 @@ const transformers = {
     },
     timestamp_to_smartdate: function(value, field) {
 
-        const column_prefix = field.bq_column;
+        const column_prefix = field.trgt_column;
 
         let d; 
         try {
@@ -76,11 +83,28 @@ const transformers = {
         }
 
         let result = {};
-        field.derivatives.forEach(derivative => {
-            result[`${column_prefix}_${derivative.suffix}`] = transformers_smartdate[derivative.suffix](d);
-        })
+
+        if ( field.transformer_type === "flat") {
+            field.derivatives.forEach(derivative => {
+                result[`${column_prefix}_${derivative.suffix}`] = transformers_smartdate[derivative.suffix](d);
+            })
+        }
+        else if ( field.transformer_type === "object") {
+            field.derivatives.forEach(derivative => {
+                if ( !result[`${column_prefix}`] ) {
+                    result[`${column_prefix}`] = {};
+                }
+                result[`${column_prefix}`][`${derivative.suffix}`] = transformers_smartdate[derivative.suffix](d);
+            })
+        }
+        else {
+            throw "transformer type is missing";
+        }
 
         return result;
+    },
+    price_hardcoded_bgn: function(value) {
+        return {value  :value, currency : "bgn"}
     }
 };
 
