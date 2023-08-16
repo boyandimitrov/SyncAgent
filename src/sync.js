@@ -1,4 +1,4 @@
-const {InputDataSources, OutputDataSources} = require("./sources/register");
+const {SourceDataSources, TargetDataSources} = require("./sources/register");
 const bq = require('./sources/bq');
 const {transformResponse} = require('./convertors/elastic');
 const EventEmitter = require('events');
@@ -29,7 +29,7 @@ class SyncManager extends EventEmitter {
 
     async synchronize(mapping) {
 
-        let {syncId, syncTimestamp} = await OutputDataSources[mapping.target].getLastSyncRecord(mapping[mapping.target]);
+        let {syncId, syncTimestamp} = await TargetDataSources[mapping.target].getLastSyncRecord(mapping[mapping.target], mapping.sync_trgt_column, mapping.sync_trgt_id_column);
         
         while (this.shouldContinueSync) {
             //const hits = await InputDataSources[this.source].search(mapping, syncTimestamp, syncId);
@@ -39,18 +39,18 @@ class SyncManager extends EventEmitter {
                 mapping.loadedFakers = this.loadedFakers;
             }
 
-            const searchResults = await InputDataSources[mapping.source].search(mapping, syncTimestamp, syncId);
+            const searchResults = await SourceDataSources[mapping.source].search(mapping, syncTimestamp, syncId);
             //const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
             if (searchResults.rows?.length > 0) {
                 console.log(`insert rows in ${mapping[mapping.target]}`);
-                await OutputDataSources[mapping.target].insertRows(mapping[mapping.target], searchResults.rows);
+                await TargetDataSources[mapping.target].insertRows(mapping[mapping.target], searchResults.rows);
 
                 await customEmitter.emit('rowsUpserted', {table: mapping[mapping.target], rows: searchResults.rows});
             }
 
             if ( searchResults.bridgeRows && Object.keys(searchResults.bridgeRows).length > 0) {
                 for ( const bridge in searchResults.bridgeRows ) {
-                    await OutputDataSources[mapping.target].insertRows(bridge, searchResults.bridgeRows[bridge]);
+                    await TargetDataSources[mapping.target].insertRows(bridge, searchResults.bridgeRows[bridge]);
                 }
             }
 
@@ -109,7 +109,7 @@ class SyncManager extends EventEmitter {
     }
 
     async createSchema(mappings, target) {
-        await OutputDataSources[target].createSchema(mappings);
+        await TargetDataSources[target].createSchema(mappings);
     }
 
     stopSync() {

@@ -133,15 +133,17 @@ async function createTable(tableName, schema) {
     console.log(`Table ${table.id} created.`);
 }
 
-async function getLastSyncRecord(tableName) {
-    const query = `SELECT id, timestamp FROM ${process.env.BQ_DATASET}.${tableName} ORDER BY timestamp DESC, id DESC LIMIT 1`;
+async function getLastSyncRecord(tableName, sync_trgt_col, sync_trgt_id_col) {
+    //const query = `SELECT id, timestamp FROM ${process.env.BQ_DATASET}.${tableName} ORDER BY timestamp DESC, id DESC LIMIT 1`;
+    const query = `SELECT ${sync_trgt_id_col}, ${sync_trgt_col} FROM ${process.env.BQ_DATASET}.${tableName} ORDER BY ${sync_trgt_col} DESC, ${sync_trgt_id_col} DESC LIMIT 1`;
     const options = {
         query: query,
         location: 'US',
     };
     const [rows] = await bigquery.query(options);
     if ( rows?.length ) {
-        return {syncId: rows[0].id, syncTimestamp : rows[0].timestamp?.value};
+        //return {syncId: rows[0].id, syncTimestamp : rows[0].timestamp?.value};
+        return {syncId: rows[0][sync_trgt_id_col], syncTimestamp : rows[0][sync_trgt_col]?.value};
     }
     return {syncId: null, syncTimestamp : null};
 }

@@ -7,26 +7,49 @@ const esClient = new Client({
 });
 
 async function _search(mapping, latestTimestamp, latestId) {
-    let body = {
-        size: mapping.sync_batch_size || 5,
-        sort: [
-            // { [mapping.sync_column]: { order: 'asc' } },
-            // { [mapping.id_column]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
-            { [mapping.sync_src_column]: { order: 'asc' } },
-            { [`${mapping.sync_src_id_column}`]: { order: 'asc' } }
-            //{ [`${mapping.sync_src_id_column}.keyword`]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
-        ],
-        query: {
-            range: {[mapping.sync_src_column]: { gt: latestTimestamp }}
-        }
-    }
-    if ( latestTimestamp && latestId ) {
-        body.search_after = [latestTimestamp, latestId];
-    }
-
     const query = {
         index: mapping.es,
-        body: body
+        body: {
+            size: mapping.sync_batch_size || 5,
+            sort: [
+                // { [mapping.sync_column]: { order: 'asc' } },
+                // { [mapping.id_column]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
+                { [mapping.sync_src_column]: { order: 'asc' } },
+                { [`${mapping.sync_src_id_column}`]: { order: 'asc' } }
+                //{ [`${mapping.sync_src_id_column}.keyword`]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
+            ],
+            query: {
+                bool: {
+                    should: [
+                        {
+                            range: {
+                                [mapping.sync_src_column]: { gt: latestTimestamp }
+                            }
+                        },
+                        {
+                            bool: {
+                                must: [
+                                    {
+                                        range: { 
+                                            [mapping.sync_src_column]: { 
+                                                gte: latestTimestamp 
+                                            } 
+                                        }
+                                    },
+                                    {
+                                        range: { 
+                                            [`${mapping.sync_src_id_column}`]: { 
+                                                gt: latestId 
+                                            } 
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+        },
     };
 
     console.log(JSON.stringify(query));

@@ -1,0 +1,48 @@
+{
+    "target" : "fb",
+    "mappings" : [    
+        {
+            "source" : "es",
+            "target" : "fb",
+            "es" : "promoto1-user",
+            "fb" : "users_1",
+            "sync_batch_size" : 2,
+            "sync_src_column" : "created",
+            "sync_src_id_column" : "_id",
+            "sync_trgt_column" : "created",
+            "sync_trgt_id_column" : "id",
+            "mapping" : [
+                {
+                    "src_column" : "_id",
+                    "src_type" : "string",
+                    "trgt_column" : "id",
+                    "trgt_type" : "String"
+                },
+                {
+                    "src_column" : "created",
+                    "src_type" : "integer",
+                    "trgt_column" : "created",
+                    "trgt_type" : "Timestamp"
+                },
+                {
+                    "src_column" : "name",
+                    "src_type" : "string",
+                    "trgt_column" : "name",
+                    "trgt_type" : "String"
+                },
+                {
+                    "src_column": "role",
+                    "src_type": "string",
+                    "trgt_column": "role",
+                    "trgt_type" : "String"
+                },
+                {
+                    "src_column" : "email",
+                    "src_type" : "string",
+                    "trgt_column" : "email",
+                    "trgt_type" : "string"
+                }
+            ]
+        }
+    ]
+}

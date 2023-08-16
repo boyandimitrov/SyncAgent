@@ -152,6 +152,9 @@ function strategyForeignKeyLookup(obj, field, id) {
 function strategyDefault(obj, field, id) {
     try {
         let value = obj[field.src_column];
+        if (field.src_column === '_id') {
+            value = id;
+        }
         const transformer = field.transformer;
         if (transformer && transformers[transformer]) {
             value = transformers[transformer](value, field);
@@ -245,7 +248,7 @@ function parseObject(obj, mapping, id, ctx) {
 
 function elasticToUniversal(hits, mapping, fakers) {
     let ctx = {fakers:fakers};
-    let result = hits.map((hit) => parseObject(hit._source, mapping, hit._source.id, ctx));
+    let result = hits.map((hit) => parseObject(hit._source, mapping, hit._id, ctx));
     let rows = result.map(r => r.value);
     let allBridgeValues = result.flatMap(r => r.bridgeValues);
     let bridgeRows = mergeBridgeValues(allBridgeValues);

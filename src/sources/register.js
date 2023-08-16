@@ -2,7 +2,7 @@ const elastic = require("./es.js");
 const bigquery = require("./bq.js");
 const firestore = require("./firestore.js");
 
-const InputDataSources = {
+const SourceDataSources = {
     es: {
         search: elastic.search
     },
@@ -11,7 +11,7 @@ const InputDataSources = {
     }
 };
 
-const OutputDataSources = {
+const TargetDataSources = {
     bq: {
         getLastSyncRecord: bigquery.getLastSyncRecord,
         insertRows: bigquery.insertRows,
@@ -21,10 +21,15 @@ const OutputDataSources = {
         getLastSyncRecord: elastic.getLastSyncRecord,
         insertRows: elastic.insertRows,
         createSchema : elastic.createSchema
+    },
+    fb: {
+        getLastSyncRecord: firestore.getLastSyncRecord,
+        insertRows: firestore.insertRows,
+        createSchema : firestore.createSchema
     }
 };
 
 
 module.exports = {
-    InputDataSources, OutputDataSources
+    SourceDataSources, TargetDataSources
 }
