@@ -86,10 +86,19 @@ async function getLastSyncRecord(collectionName, sync_trgt_col, sync_trgt_id_col
         const collection = fbClient.collection(collectionName);
 
         // Create a query: sort by date_updated desc, and then id desc, and limit to 1 document
-        const query = collection
+        let buildQuery  = collection
             .orderBy(sync_trgt_col, 'desc')
-            .orderBy(sync_trgt_id_col, 'desc')
-            .limit(1);
+
+        if (sync_trgt_col !== sync_trgt_id_col) {
+            buildQuery = buildQuery
+                .orderBy(sync_trgt_id_col, 'desc')
+        }
+
+        const query = buildQuery.limit(1);
+        // const query = collection
+        //     .orderBy(sync_trgt_col, 'desc')
+        //     .orderBy(sync_trgt_id_col, 'desc')
+        //     .limit(1);
 
         // Execute the query
         const snapshot = await query.get();

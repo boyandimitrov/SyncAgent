@@ -159,11 +159,45 @@ function strategyDefault(obj, field, id) {
         if (transformer && transformers[transformer]) {
             value = transformers[transformer](value, field);
         }
+
+        if (typeof value === 'undefined') {
+            return null;
+        }
+
         if ( field.trgt_type !== 'CUSTOM') {
             return {[field.trgt_column] : value};
         }
         else {
             return value;
+        }
+    }
+    catch (e) {
+        console.error(e);
+    }
+
+    return null
+}
+
+function strategyArraySimple(obj, field, id) {
+    try {
+        let value = obj[field.src_column];
+        if (value && Array.isArray(value) && value.length) {
+            return {[field.trgt_column] : value};
+        }
+    }
+    catch (e) {
+        console.error(e);
+    }
+
+    return null
+}
+
+function strategyObjectSimple(obj, field, id) {
+    try {
+        let value = obj[field.src_column];
+        // is not empty object check
+        if (value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length > 0) {
+            return {[field.trgt_column] : value};
         }
     }
     catch (e) {
@@ -234,6 +268,12 @@ function parseObject(obj, mapping, id, ctx) {
                     bridgeValues.push(value.bridgeValue);
                 }
                 value = value?.value;
+                break;
+            case "arraySimple" : 
+                value = strategyArraySimple(obj, field, id);
+                break;
+            case "objectSimple" : 
+                value = strategyObjectSimple(obj, field, id);
                 break;
             default:
                 value = strategyDefault(obj, field, id);

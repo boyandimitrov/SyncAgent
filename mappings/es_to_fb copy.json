@@ -1,0 +1,197 @@
+{
+    "target" : "fb",
+    "mappings" : [    
+        {
+            "source" : "es",
+            "target" : "fb",
+            "es" : "promoto1-user",
+            "fb" : "users_1",
+            "sync_batch_size" : 2,
+            "sync_src_column" : "created",
+            "sync_src_id_column" : "_id",
+            "sync_trgt_column" : "created",
+            "sync_trgt_id_column" : "id",
+            "mapping" : [
+                {
+                    "src_column" : "_id",
+                    "src_type" : "string",
+                    "trgt_column" : "id",
+                    "trgt_type" : "String"
+                },
+                {
+                    "src_column" : "created",
+                    "src_type" : "integer",
+                    "trgt_column" : "created",
+                    "trgt_type" : "Timestamp"
+                },
+                {
+                    "src_column" : "name",
+                    "src_type" : "string",
+                    "trgt_column" : "name",
+                    "trgt_type" : "String"
+                },
+                {
+                    "src_column": "role",
+                    "src_type": "string",
+                    "trgt_column": "role",
+                    "trgt_type" : "String"
+                },
+                {
+                    "src_column" : "email",
+                    "src_type" : "string",
+                    "trgt_column" : "email",
+                    "trgt_type" : "string"
+                }
+            ]
+        },
+        {
+            "source" : "es",
+            "target" : "fb",
+            "es" : "promoto-promotion",
+            "fb" : "promotion_1",
+            "sync_batch_size" : 2,
+            "sync_src_column" : "date_updated",
+            "sync_src_id_column" : "_id",
+            "sync_trgt_column" : "date_updated",
+            "sync_trgt_id_column" : "id",
+            "mapping" : [
+                {
+                    "src_column" : "_id",
+                    "src_type" : "string",
+                    "trgt_column" : "id",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "date_created",
+                    "src_type" : "timestamp",
+                    "trgt_column" : "date_created",
+                    "trgt_type" : "timestamp"
+                },
+                {
+                    "src_column" : "date_updated",
+                    "src_type" : "timestamp",
+                    "trgt_column" : "date_updated",
+                    "trgt_type" : "timestamp"
+                },
+                {
+                    "src_column" : "name_bg",
+                    "src_type" : "string",
+                    "trgt_column" : "name_bg",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "image",
+                    "src_type" : "string",
+                    "trgt_column" : "image",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column": "active",
+                    "src_type": "bool",
+                    "trgt_column": "active",
+                    "trgt_type" : "boolean"
+                },
+                {
+                    "src_column" : "type",
+                    "src_type" : "string",
+                    "trgt_column" : "type",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "discountType",
+                    "src_type" : "string",
+                    "trgt_column" : "discountType",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "ownerType",
+                    "src_type" : "string",
+                    "trgt_column" : "ownerType",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "identifier",
+                    "src_type" : "string",
+                    "trgt_column" : "identifier",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "description_bg",
+                    "src_type" : "string",
+                    "trgt_column" : "description_bg",
+                    "trgt_type" : "string"
+                },
+                {
+                    "src_column" : "product",
+                    "src_type" : "array",
+                    "trgt_column" : "product",
+                    "trgt_type" : "array",
+                    "strategy" : "arraySimple"
+                },
+                {
+                    "src_column" : "owner",
+                    "src_type" : "object",
+                    "trgt_column" : "owner",
+                    "trgt_type" : "object",
+                    "strategy" : "objectSimple"
+                },
+                {
+                    "src_column" : "comboProduct",
+                    "src_type" : "array",
+                    "trgt_column" : "comboProduct",
+                    "trgt_type" : "array",
+                    "strategy" : "arraySimple"
+                },
+                {
+                    "src_column" : "comboDiscount",
+                    "src_type" : "object",
+                    "trgt_column" : "comboDiscount",
+                    "trgt_type" : "object",
+                    "strategy" : "objectSimple"
+                },
+                {
+                    "src_column" : "countDiscount",
+                    "src_type" : "object",
+                    "trgt_column" : "countDiscount",
+                    "trgt_type" : "object",
+                    "strategy" : "objectSimple"
+                },
+                {
+                    "src_column" : "quantity",
+                    "src_type" : "object",
+                    "trgt_column" : "quantity",
+                    "trgt_type" : "object",
+                    "strategy" : "objectSimple"
+                },
+                {
+                    "src_column" : "tid",
+                    "src_type" : "array",
+                    "trgt_column" : "tid",
+                    "trgt_type" : "array",
+                    "strategy" : "arraySimple"
+                },
+                {
+                    "src_column" : "budget",
+                    "src_type" : "object",
+                    "trgt_column" : "budget",
+                    "trgt_type" : "object",
+                    "strategy" : "objectSimple"
+                },
+                {
+                    "src_column" : "priceDiscount",
+                    "src_type" : "object",
+                    "trgt_column" : "priceDiscount",
+                    "trgt_type" : "object",
+                    "strategy" : "objectSimple"
+                },
+                {
+                    "src_column" : "store",
+                    "src_type" : "array",
+                    "trgt_column" : "store",
+                    "trgt_type" : "array",
+                    "strategy" : "arraySimple"
+                }
+            ]
+        }
+    ]
+}

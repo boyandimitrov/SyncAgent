@@ -9,15 +9,22 @@ const esClient = new Client({
 async function _search(mapping, latestTimestamp, latestId) {
     let body = {
         size: mapping.sync_batch_size || 5,
+        // sort: [
+        //     // { [mapping.sync_column]: { order: 'asc' } },
+        //     // { [mapping.id_column]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
+        //     { [mapping.sync_src_column]: { order: 'desc' } },
+        //     { [`${mapping.sync_src_id_column}`]: { order: 'desc' } }
+        //     //{ [`${mapping.sync_src_id_column}.keyword`]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
+        // ],
         sort: [
             // { [mapping.sync_column]: { order: 'asc' } },
             // { [mapping.id_column]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
-            { [mapping.sync_src_column]: { order: 'asc' } },
-            { [`${mapping.sync_src_id_column}`]: { order: 'asc' } }
+            {[mapping.sync_src_column]: { order: 'asc' } },
+            {[`${mapping.sync_src_id_column}`]: { order: 'asc' }} 
             //{ [`${mapping.sync_src_id_column}.keyword`]: { order: 'asc' } } // Assuming 'id' is the name of the ID field
         ],
         query: {
-            range: {[mapping.sync_src_column]: { gt: latestTimestamp }}
+            range: {[mapping.sync_src_column]: { gte: latestTimestamp }}
         }
     }
     if ( latestTimestamp && latestId ) {
@@ -47,8 +54,10 @@ async function search(mapping, latestTimestamp, latestId) {
         // Remember NEWest timestamp of the last synced document
         // syncTimestamp = hits[hits.length - 1]?._source?.[mapping.sync_column];
         //syncId = hits[hits.length - 1]?._source?.[mapping.sync_id_column];
+        // syncTimestamp = hits[hits.length - 1]?._source?.[mapping.sync_src_column];
+        // syncId = hits[hits.length - 1]?.[mapping.sync_src_id_column];
         syncTimestamp = hits[hits.length - 1]?._source?.[mapping.sync_src_column];
-        syncId = hits[hits.length - 1]?._source?.[mapping.sync_src_id_column];
+        syncId = hits[hits.length - 1]?.[mapping.sync_src_id_column];
     
         return {rows, bridgeRows, syncTimestamp, syncId};
     }
