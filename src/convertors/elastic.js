@@ -207,6 +207,33 @@ function strategyObjectSimple(obj, field, id) {
     return null
 }
 
+function strategyTokenize(obj, field, id) {
+    try {
+        let tokens = [];
+        let value = obj[field.src_column];
+        const words = value.toLowerCase().split(" ");
+        words.forEach((word) => {
+            let index = 3;
+            if (word.length < index) {
+                return;
+            }
+            while (true) {
+                const fragment = word.slice(0, index);
+                tokens.push(fragment);
+                if (index >= word.length) {
+                    break;
+                }
+                index++;
+            }
+        });
+        return  {[field.trgt_column] : tokens};
+    }
+    catch(e) {
+        console.error(e)
+    }
+    return null;
+}
+
 function mergeBridgeValues(bridgeValues) {
     let result = {};
 
@@ -274,6 +301,9 @@ function parseObject(obj, mapping, id, ctx) {
                 break;
             case "objectSimple" : 
                 value = strategyObjectSimple(obj, field, id);
+                break;
+            case "tokenize" : 
+                value = strategyTokenize(obj, field, id);
                 break;
             default:
                 value = strategyDefault(obj, field, id);
