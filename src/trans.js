@@ -4,7 +4,7 @@ const elastic = require("./sources/es.js");
 const bigquery = require("./sources/bq.js");
 
 const customEmitter = new CustomStrategyEmitter();
-class SyncManager extends EventEmitter {
+class TransManager extends EventEmitter {
     constructor() {
         super();
         this.shouldContinueSync = true;
@@ -20,23 +20,23 @@ class SyncManager extends EventEmitter {
             // Add one month
             date.setMonth(date.getMonth() + 1);
 
-            syncTimestamp = date.getTime();
+            latestTimestamp = date.toISOString();
         }
         else {
-            syncTimestamp = await bigquery.getLastTransactionDate();
+            latestTimestamp = await bigquery.getLastTransactionDate();
         }
 
-        if(!lastSync) {
+        if(!latestTimestamp) {
             console.log("cannot retrieve last updated and now sync will happen");
 
             return;
         }        
 
-        await bigquery.getTransactions(syncTimestamp, 0, async(records) => {
-            await elastic.updateShopQuantities(records);
-        });
+        // await bigquery.getTransactions(latestTimestamp, 0, async(records) => {
+        //     await elastic.updateShopQuantities(records);
+        // });
 
-        await elastic.saveLastSyncResource(hti?.id || null, latestTimestamp);
+        await elastic.saveLastSyncResource(hit?.id || null, latestTimestamp);
     }
 
     async syncAndSetTimeout() {
@@ -46,7 +46,7 @@ class SyncManager extends EventEmitter {
 
         await this.synchronize();
 
-        setTimeout(() => this.syncAndSetTimeout(mapping), process.env.TRANSACTIONS_SYNC_INTERVAL);
+        setTimeout(() => this.syncAndSetTimeout(), process.env.TRANSACTIONS_SYNC_INTERVAL);
     }
 
     startSync() {
@@ -60,4 +60,4 @@ class SyncManager extends EventEmitter {
     }
 }
 
-module.exports = SyncManager;
+module.exports = TransManager;

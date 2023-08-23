@@ -1,5 +1,7 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 
+const BATCH_SIZE = parseInt(process.env.TRANSACTIONS_BATCH_SIZE);
+
 const bigquery = new BigQuery({
     projectId: process.env.BQ_ID,
     keyFilename: process.env.BQ_CERT_FILE,
@@ -157,7 +159,7 @@ async function insertRows (tableName, rows) {
 }
 
 async function getLastTransactionDate() {
-    const query = `SELECT max(created) FROM ${process.env.BQ_DATASET}.transactionLines`;
+    const query = `SELECT max(created) as lastSync FROM ${process.env.BQ_DATASET}.transactionLines`;
     const [job] = await bigquery.createQueryJob({
         query: query
     });
@@ -166,16 +168,17 @@ async function getLastTransactionDate() {
     const [rows] = await job.getQueryResults();
 
     if (rows?.length) {
-        return rows[0]['created']
+        return rows[0]?.lastSync?.value || null;
     }
     return null;
 }
 
 async function getTransactions(lastSync, offset=0, callback) {
-    const query = `SELECT fk_product, fk_store, count(fk_product) 
+    const query = `SELECT fk_product, fk_store, count(created) as sold, MAX(created) as latest_created 
         FROM  ${process.env.BQ_DATASET}.transactionLines
         WHERE created < @date
         GROUP BY fk_product, fk_store
+        ORDER BY latest_created ASC
         LIMIT @limit
         OFFSET @offset;
     `;
@@ -191,7 +194,7 @@ async function getTransactions(lastSync, offset=0, callback) {
             {
                 name: 'limit',
                 parameterType: { type: 'INT64' },
-                parameterValue: { value: process.env.TRANSACTIONS_BATCH_SIZE }
+                parameterValue: { value: BATCH_SIZE }
             },
             {
                 name: 'offset',
@@ -209,11 +212,11 @@ async function getTransactions(lastSync, offset=0, callback) {
     // Print the results
     if ( rows?.length ) {
         let row = rows[0];
-        console.log(`fk_product: ${row.fk_product}, fk_store: ${row.fk_store}, count: ${row['count(fk_product)']}`);
+        console.log(`fk_product: ${row.fk_product}, fk_store: ${row.fk_store}, count: ${row['sold']}`);
     }
 
     if (rows.length === BATCH_SIZE) {
-        await getTransactions(date, offset + BATCH_SIZE, callback);
+        await getTransactions(lastSync, offset + BATCH_SIZE, callback);
     }
 }
 

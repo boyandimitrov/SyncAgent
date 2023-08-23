@@ -1,23 +1,15 @@
 require('dotenv').config();
 
-const {target, mappings} = require('./mappings/es_to_fb.json');
+const TransManager = require('./src/trans');
 
-const SyncManager = require('./src/sync');
-
-const syncManager = new SyncManager();
+const syncManager = new TransManager();
 
 async function startSync() {
-    syncManager.startSync(mappings);
-}
-
-async function updateSync() {
-    const newMappings = mappings;
-    syncManager.startSync(newMappings);
+    syncManager.startSync();
 }
 
 async function initSync() {
-    await syncManager.createSchema(mappings, target);
-    console.log("Schema created");
+    console.log("Sync started");
 }
 
 initSync()

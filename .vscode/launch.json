@@ -9,6 +9,13 @@
         },
         {
             "type": "node-terminal",
+            "name": "Transactions",
+            "request": "launch",
+            "command": "node index_transactions.js",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "node-terminal",
             "name": "Import",
             "request": "launch",
             "command": "node index_import.js",

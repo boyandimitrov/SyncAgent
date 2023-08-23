@@ -183,6 +183,7 @@ async function searchResources(url) {
         });
     
         console.log('Search results:', response.body.hits.hits);
+        return response.body.hits.hits;
     } 
     catch (error) {
         console.error('Error searching documents:', error);
@@ -192,9 +193,12 @@ async function searchResources(url) {
 async function getLastSyncResource() {
     await createResources();
 
-    const hit = await searchResources(process.env.ELASTICSEARCH_URL);
+    const hits = await searchResources(process.env.ELASTICSEARCH_URL);
 
-    return hit;
+    if ( hits?.length) {
+        return hits[0]._source;
+    }
+    return {};
 }
 
 async function saveLastSyncResource(id, lastSync) {
@@ -226,48 +230,77 @@ async function saveLastSyncResource(id, lastSync) {
     }
 }
 
+async function getBulkData(rows) {
+    const body = [];
+
+    for (let item of rows) {
+        body.push({ index: 'promoto-stock_new' });
+        body.push({
+            size: 1,
+            query: {
+                bool: {
+                    must: [
+                        { term: { "store.id.keyword": item.fk_store } },
+                        { term: { "productBase.id.keyword": item.fk_product } }
+                    ]
+                }
+            }
+        });
+    }
+
+    const response = await esClient.msearch({ body });
+
+    let results = response.body.responses.map((res, idx) => {
+        if (res.hits.hits.length > 0) {
+            return {_id : res.hits.hits[0]._id, sold : rows[idx].sold};
+        }
+        console.error(`No ID found for store: ${rows[idx].fk_store}, productBase: ${rows[idx].fk_product}`);
+        return null;
+    });
+
+    return results.filter(item => item !== null);
+}
+
 async function updateShopQuantities(rows) {
-    try {
-        const response = await esClient.updateByQuery({
-            index: 'stock',
-            body: {
-                script: {
-                    source: `
-                        for (int i = 0; i < params.products.length; i++) {
-                            if (ctx._source.product_id == params.products[i].id) {
-                                ctx._source.quantity -= params.products[i].sold;
-                                break;
-                            }
-                        }
-                    `,
-                    lang: 'painless',
-                    params: {
-                        products: [
-                            {
-                                id: 'product_001',
-                                sold: 40
-                            },
-                            {
-                                id: 'product_002',
-                                sold: 30
-                            }
-                            // ... Add more products with their respective sold quantities.
-                        ]
-                    }
-                },
-                query: {
-                        terms: {
-                            'product_id.keyword': ['product_001', 'product_002'] // ... Add more product IDs as needed.
-                        }
-                    },
-                size: 100
+
+    const data = await getBulkData(rows);
+
+    // Prepare bulk payload
+    const body = [];
+    
+    data.forEach(item => {
+        // Meta-data line
+        body.push({
+            update: {
+                _index: 'promoto-stock_new',
+                _id : item._id
             }
         });
     
-        console.log('Update results:', response.body);
+        // Data line
+        body.push({
+            script: {
+                source: "ctx._source.currentQuantity -= params.sold",
+                lang: "painless",
+                params: {
+                    sold: item.sold  // Assuming you know how much to subtract for each item
+                }
+            }
+        });
+    });
+
+    if ( !body.length) {
+        return;
+    }
+    
+    // Perform bulk update
+    try {
+        const response = await esClient.bulk({ body });
+        console.log(response);
+        // You might want to check for and handle any errors in the response here
     } 
     catch (error) {
-        console.error('Error updating stock quantities:', error);
+        console.error('Bulk update failed:', error);
     }
 }
 
