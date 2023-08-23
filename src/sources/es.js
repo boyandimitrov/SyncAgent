@@ -1,10 +1,14 @@
 const { Client } = require('@elastic/elasticsearch');
+const { v4: uuidv4 } = require('uuid');
+
 const {transformers} = require('../transformers');
 const convertor = require("../convertors/elastic");
 
 const esClient = new Client({
     node: process.env.ELASTICSEARCH_URL,
 });
+
+const IDX_RESOURCES = "resources";
 
 async function _search(mapping, latestTimestamp, latestId) {
     let body = {
@@ -126,6 +130,147 @@ async function insertRows (indexName, rows) {
     }
 }
 
+//FUNCTIONS THAT FOLLOW ARE FOR TRANSACTIONS
+
+async function createResources() {
+    try {
+        // Check if index already exists
+        const exists = await esClient.indices.exists({ index: IDX_RESOURCES });
+        if (exists.body) {
+            console.log('Index already exists. Exiting.');
+            return;
+        }
+  
+        // Create the index
+        const response = await esClient.indices.create({
+            index: IDX_RESOURCES,
+            body: {
+                mappings: {
+                    properties: {
+                        identifier: {
+                            type: 'text',
+                            fields: {
+                                keyword: {
+                                    type: 'keyword', // this sub-field allows exact match searches
+                                }
+                            }
+                        },
+                        lastSync: {
+                            type: 'date'
+                        }
+                    }
+                }
+            }
+        });
+        console.log('Index created:', response);
+    } 
+    catch (error) {
+        console.error('Error creating index:', error);
+    }
+}
+
+async function searchResources(url) {
+    try {
+        const response = await esClient.search({
+        index: IDX_RESOURCES,
+        body: {
+            query: {
+                term: {
+                    "identifier.keyword": url
+                }
+            }
+        }
+        });
+    
+        console.log('Search results:', response.body.hits.hits);
+    } 
+    catch (error) {
+        console.error('Error searching documents:', error);
+    }
+}
+
+async function getLastSyncResource() {
+    await createResources();
+
+    const hit = await searchResources(process.env.ELASTICSEARCH_URL);
+
+    return hit;
+}
+
+async function saveLastSyncResource(id, lastSync) {
+    await createResources();
+
+    if (!id) {
+        id = uuidv4();
+    }
+
+    const doc = {
+        identifier: process.env.ELASTICSEARCH_URL,
+        lastSync: new Date(lastSync).toISOString()
+    };
+
+    try {
+        const response = await esClient.update({
+            index: IDX_RESOURCES,
+            id: id,
+            body: {
+                doc: doc,
+                upsert: doc
+            }
+        });
+    
+        console.log('Upsert response:', response.body);
+    } 
+    catch (error) {
+        console.error('Error upserting document:', error);
+    }
+}
+
+async function updateShopQuantities(rows) {
+    try {
+        const response = await esClient.updateByQuery({
+            index: 'stock',
+            body: {
+                script: {
+                    source: `
+                        for (int i = 0; i < params.products.length; i++) {
+                            if (ctx._source.product_id == params.products[i].id) {
+                                ctx._source.quantity -= params.products[i].sold;
+                                break;
+                            }
+                        }
+                    `,
+                    lang: 'painless',
+                    params: {
+                        products: [
+                            {
+                                id: 'product_001',
+                                sold: 40
+                            },
+                            {
+                                id: 'product_002',
+                                sold: 30
+                            }
+                            // ... Add more products with their respective sold quantities.
+                        ]
+                    }
+                },
+                query: {
+                        terms: {
+                            'product_id.keyword': ['product_001', 'product_002'] // ... Add more product IDs as needed.
+                        }
+                    },
+                size: 100
+            }
+        });
+    
+        console.log('Update results:', response.body);
+    } 
+    catch (error) {
+        console.error('Error updating stock quantities:', error);
+    }
+}
+
 module.exports = {
-    search, createSchema, getLastSyncRecord, insertRows
+    search, createSchema, getLastSyncRecord, insertRows, updateShopQuantities, getLastSyncResource, saveLastSyncResource
 }

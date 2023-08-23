@@ -156,6 +156,67 @@ async function insertRows (tableName, rows) {
     await table.insert(rows, { ignoreUnknownValues: true });
 }
 
+async function getLastTransactionDate() {
+    const query = `SELECT max(created) FROM ${process.env.BQ_DATASET}.transactionLines`;
+    const [job] = await bigquery.createQueryJob({
+        query: query
+    });
+    
+    // Wait for the query to finish
+    const [rows] = await job.getQueryResults();
+
+    if (rows?.length) {
+        return rows[0]['created']
+    }
+    return null;
+}
+
+async function getTransactions(lastSync, offset=0, callback) {
+    const query = `SELECT fk_product, fk_store, count(fk_product) 
+        FROM  ${process.env.BQ_DATASET}.transactionLines
+        WHERE created < @date
+        GROUP BY fk_product, fk_store
+        LIMIT @limit
+        OFFSET @offset;
+    `;
+
+    const [job] = await bigquery.createQueryJob({
+        query: query,
+        queryParameters: [
+            {
+                name: 'date',
+                parameterType: { type: 'TIMESTAMP' },
+                parameterValue: { value: lastSync }
+            },
+            {
+                name: 'limit',
+                parameterType: { type: 'INT64' },
+                parameterValue: { value: process.env.TRANSACTIONS_BATCH_SIZE }
+            },
+            {
+                name: 'offset',
+                parameterType: { type: 'INT64' },
+                parameterValue: { value: offset }
+            }
+        ]
+    });
+    
+    // Wait for the query to finish
+    const [rows] = await job.getQueryResults();
+
+    await callback(rows);
+
+    // Print the results
+    if ( rows?.length ) {
+        let row = rows[0];
+        console.log(`fk_product: ${row.fk_product}, fk_store: ${row.fk_store}, count: ${row['count(fk_product)']}`);
+    }
+
+    if (rows.length === BATCH_SIZE) {
+        await getTransactions(date, offset + BATCH_SIZE, callback);
+    }
+}
+
 module.exports = {
-    createSchema, createTable, getLastSyncRecord, insertRows
+    createSchema, createTable, getLastSyncRecord, insertRows, getTransactions, getLastTransactionDate
 }
