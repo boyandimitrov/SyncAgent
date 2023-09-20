@@ -1,0 +1,18 @@
+version: '3'
+services:
+  elastic-firestore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SYNC_MAPPING=es_to_fb
+      - NODE_ENV=production
+    command: node index.js
+  firestore-elastic-quantities:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+    command: node index_transactions.js
+    

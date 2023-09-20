@@ -1,0 +1,28 @@
+version: '3'
+services:
+  elastic-firestore:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SYNC_MAPPING=es_to_fb
+    ports:
+      - "3001:3000" # Adjust the ports as needed
+
+  bq-sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SYNC_MAPPING=bq-sync
+    ports:
+      - "3002:3000" # Adjust the ports as needed
+
+  firestone-sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SYNC_MAPPING=firestone-sync
+    ports:
+      - "3003:3000" # Adjust the ports as needed

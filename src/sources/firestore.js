@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const convertor = require("../convertors/firestore");
+const {log} = require('../LogService');
 
 const serviceAccount = require("../../certs/promoto-bcaef-firebase-adminsdk-s666c-303061354d.json");
 
@@ -110,6 +111,12 @@ async function getLastSyncRecord(collectionName, sync_trgt_col, sync_trgt_id_col
         }
     } catch (error) {
         console.error('Error querying Firestore:', error);
+        log({
+            type: "error",
+            title : `Error querying Firestore`,
+            message : `Error querying Firestore`,
+            meta: {error}
+        }) 
     }
 
     return { syncId: null, syncTimestamp: null };
@@ -135,6 +142,12 @@ async function insertRows (indexName, rows) {
                 }
             });
             console.error('Failed documents:', JSON.stringify(erroredDocuments, null, 2));
+            log({
+                type: "error",
+                title : `Failed insert firestore documents`,
+                message : `Failed insert firestore documents`,
+                meta: {firstErrorDocs : erroredDocuments.slice(0,10)}
+            }) 
         }
 
     } 
@@ -168,6 +181,12 @@ async function insertRows(collectionName, rows) {
 // }
     } catch (error) {
         console.error('Error inserting documents into Firestore:', error);
+        log({
+            type: "error",
+            title : `Error inserting documents into Firestore`,
+            message : `Error inserting documents into Firestore`,
+            meta: {error}
+        }) 
     }
 }
 

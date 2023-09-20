@@ -1,6 +1,8 @@
 require('dotenv').config();
 
-const {target, mappings} = require('./mappings/es_to_fb.json');
+const mapping = process.env.SYNC_MAPPING;
+
+const {target, mappings} = require(`./mappings/${mapping}.json`);
 
 const SyncManager = require('./src/sync');
 

@@ -32,9 +32,9 @@ class TransManager extends EventEmitter {
             return;
         }        
 
-        // await bigquery.getTransactions(latestTimestamp, 0, async(records) => {
-        //     await elastic.updateShopQuantities(records);
-        // });
+        await bigquery.getTransactions(latestTimestamp, 0, async(records) => {
+            await elastic.updateShopQuantities(records);
+        });
 
         await elastic.saveLastSyncResource(hit?.id || null, latestTimestamp);
     }

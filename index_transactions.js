@@ -1,4 +1,8 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+const nodeEnv = process.env.NODE_ENV || 'development';
+dotenv.config({
+    path: `.env.${nodeEnv}`
+})
 
 const TransManager = require('./src/trans');
 

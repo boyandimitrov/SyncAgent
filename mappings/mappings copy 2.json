@@ -1,0 +1,264 @@
+{
+    "target" : "bq",
+    "mappings" : [    
+        {
+            "source" : "fb",
+            "target" : "bq",
+            "fb" : "transactions_1",
+            "bq" : "transaction",
+            "sync_batch_size" : 100,
+            "sync_column" : "updated",
+            "sync_column2" : "created",
+            "id_column" : "id",
+            "bridges" : [
+                {
+                    "source" : "fb",
+                    "target" : "bq",
+                    "bq" : "transactionLines",
+                    "mapping" : [
+                        {
+                            "fb_column" : "code",
+                            "fb_type" : "string",
+                            "bq_column" : "code",
+                            "bq_type" : "STRING"
+                        },
+                        {
+                            "fb_column": "created",
+                            "fb_type": "integer",
+                            "bq_column": "created",
+                            "bq_type": "TIMESTAMP",
+                            "transformer" : "miliseconds_to_timestamp"
+                        },
+                        {
+                            "fb_column": "inPromotion",
+                            "fb_type": "bool",
+                            "bq_column": "inPromotion",
+                            "bq_type": "BOOL"
+                        },
+                        {
+                            "fb_column": "discount",
+                            "fb_type": "float",
+                            "bq_column": "discount",
+                            "bq_type": "FLOAT64"
+                        },
+                        {
+                            "fb_column": "price",
+                            "fb_type": "float",
+                            "bq_column": "price",
+                            "bq_type": "FLOAT64"
+                        },
+                        {
+                            "fb_column": "quantityType",
+                            "fb_type": "string",
+                            "bq_column": "quantityType",
+                            "bq_type": "STRING"
+                        },
+                        {
+                            "fb_column": "quantityValue",
+                            "fb_type": "integer",
+                            "bq_column": "quantityValue",
+                            "bq_type": "FLOAT64"
+                        },
+                        {
+                            "fb_column": "profit",
+                            "fb_type": "float",
+                            "bq_column": "profit",
+                            "bq_type": "FLOAT64"
+                        },
+                        {
+                            "fb_column": "updated",
+                            "fb_type": "integer",
+                            "bq_column": "updated",
+                            "bq_type": "TIMESTAMP",
+                            "transformer" : "miliseconds_to_timestamp"
+                        },
+                        {
+                            "fb_column" : "product",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_simple",
+                            "fk" : [
+                                {
+                                    "fb_column" : "id",
+                                    "fb_type" : "string",
+                                    "bq_column" : "fk_product",
+                                    "bq_type" : "string"
+                                }
+                            ]
+                        },
+                        {
+                            "fb_column" : "product",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_simple",
+                            "fk" : [
+                                {
+                                    "fb_column" : "id",
+                                    "fb_type" : "string",
+                                    "bq_column" : "fk_distributor",
+                                    "bq_type" : "string"
+                                }
+                            ]
+                        },
+                        {
+                            "fb_column" : "product",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_simple",
+                            "fk" : [
+                                {
+                                    "fb_column" : "id",
+                                    "fb_type" : "string",
+                                    "bq_column" : "fk_store",
+                                    "bq_type" : "string"
+                                }
+                            ]
+                        },
+                        {
+                            "fb_column" : "product",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_simple",
+                            "fk" : [
+                                {
+                                    "fb_column" : "id",
+                                    "fb_type" : "string",
+                                    "bq_column" : "fk_promotion",
+                                    "bq_type" : "string"
+                                }
+                            ]
+                        },
+                        {
+                            "fb_column" : "product",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_simple",
+                            "fk" : [
+                                {
+                                    "fb_column" : "id",
+                                    "fb_type" : "string",
+                                    "bq_column" : "fk_distributor_store",
+                                    "bq_type" : "string"
+                                }
+                            ]
+                        },
+                        {
+                            "fb_column" : "product",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_simple",
+                            "fk" : [
+                                {
+                                    "fb_column" : "id",
+                                    "fb_type" : "string",
+                                    "bq_column" : "fk_manufacturer",
+                                    "bq_type" : "string"
+                                }
+                            ]
+                        },
+                        {
+                            "fb_column" : "id",
+                            "fb_type" : "object",
+                            "strategy" : "foreign_key_parent",
+                            "bq_column" : "fk_transaction",
+                            "bq_type" : "string"
+                        },
+                        {
+                            "fb_columns": ["updated", "created"],
+                            "fb_type": "integer",
+                            "strategy" : "formula",
+                            "bq_column": "timestamp",
+                            "bq_type": "TIMESTAMP",
+                            "transformer" : "miliseconds_to_timestamp",
+                            "formula" : "updated || created"
+                        },
+                        {
+                            "fb_column" : "id",
+                            "fb_type" : "string",
+                            "bq_column" : "id",
+                            "bq_type" : "STRING"
+                        }        
+                    ]
+                }       
+            ],
+            "mapping" : [
+                {
+                    "fb_column" : "id",
+                    "fb_type" : "string",
+                    "bq_column" : "id",
+                    "bq_type" : "STRING"
+                },
+                {
+                    "fb_column": "firebaseTenantId",
+                    "fb_type": "string",
+                    "bq_column": "firebaseTenantId",
+                    "bq_type": "STRING"
+                },
+                {
+                    "fb_column": "receiptNumber",
+                    "fb_type": "int",
+                    "bq_column": "receiptNumber",
+                    "bq_type": "INT64"
+                },
+                {
+                    "fb_column": "status",
+                    "fb_type": "string",
+                    "bq_column": "status",
+                    "bq_type": "STRING"
+                },
+                {
+                    "fb_column": "userId",
+                    "fb_type": "string",
+                    "bq_column" : "fk_user",
+                    "bq_type" : "string"
+                },
+                {
+                    "fb_column": "shopId",
+                    "fb_type": "string",
+                    "bq_column" : "fk_shop",
+                    "bq_type" : "string"
+                },
+                {
+                    "fb_column": "checkoutId",
+                    "fb_type": "string",
+                    "bq_column" : "fk_checkout",
+                    "bq_type" : "string"
+                },
+                {
+                    "fb_column": "updated",
+                    "fb_type": "integer",
+                    "bq_column": "updated",
+                    "bq_type": "TIMESTAMP",
+                    "transformer" : "miliseconds_to_timestamp"
+                },
+                {
+                    "fb_column": "created",
+                    "fb_type": "integer",
+                    "bq_column": "created",
+                    "bq_type" : "CUSTOM",
+                    "derivatives" :[
+                        { "suffix" : "master", "bq_type" : "TIMESTAMP" },
+                        { "suffix" : "quarter", "bq_type" : "INT64" },
+                        { "suffix" : "half",  "bq_type" : "INT64" },
+                        { "suffix" : "year", "bq_type" : "INT64" },
+                        { "suffix" : "month", "bq_type" : "INT64" },
+                        { "suffix" : "date", "bq_type" : "INT64" },
+                        { "suffix" : "day", "bq_type" : "INT64" },
+                        { "suffix" : "week",  "bq_type" : "INT64" }                    
+                    ],
+                    "transformer" : "timestamp_to_smartdate",
+                    "transformer_type" : "flat"
+                },
+                {
+                    "fb_columns": ["updated", "created"],
+                    "fb_type": "integer",
+                    "strategy" : "formula",
+                    "bq_column": "timestamp",
+                    "bq_type": "TIMESTAMP",
+                    "transformer" : "miliseconds_to_timestamp",
+                    "formula" : "updated || created"
+                },
+                {
+                    "fb_column" : "transactionLines",
+                    "fb_type" : "array",
+                    "strategy" : "foreign_table",
+                    "fb_table" : "transactionLines"
+                }
+            ]
+        }
+    ]
+}

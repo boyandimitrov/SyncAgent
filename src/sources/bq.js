@@ -1,4 +1,5 @@
 const { BigQuery } = require('@google-cloud/bigquery');
+const {log} = require('../LogService');
 
 const BATCH_SIZE = parseInt(process.env.TRANSACTIONS_BATCH_SIZE);
 

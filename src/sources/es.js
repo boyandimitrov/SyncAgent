@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const {transformers} = require('../transformers');
 const convertor = require("../convertors/elastic");
+const {log} = require('../LogService');
 
 const esClient = new Client({
     node: process.env.ELASTICSEARCH_URL,
@@ -98,6 +99,13 @@ async function getLastSyncRecord(indexName, sync_trgt_col, sync_trgt_id_col) {
         }
     } catch (error) {
         console.error('Error querying Elasticsearch:', error);
+        log({
+            type: "error",
+            title : `Error querying Elasticsearch`,
+            message : `Error querying Elasticsearch`,
+            meta: {error}
+        }) 
+
     }
     
     return { syncId: null, syncTimestamp: null };
@@ -122,11 +130,25 @@ async function insertRows (indexName, rows) {
                 }
             });
             console.error('Failed documents:', JSON.stringify(erroredDocuments, null, 2));
+            log({
+                type: "error",
+                title : `Failed to insert some documents`,
+                message : `Failed to insert some documents`,
+                meta: {firstErroredDocs: erroredDocuments.slice(0,10)}
+            }) 
+    
         }
 
     } 
     catch (error) {
         console.error('Error inserting documents into Elasticsearch:', error);
+        log({
+            type: "error",
+            title : `Error inserting documents into Elasticsearch`,
+            message : `Error inserting documents into Elasticsearch`,
+            meta: {error}
+        }) 
+
     }
 }
 
@@ -166,6 +188,13 @@ async function createResources() {
     } 
     catch (error) {
         console.error('Error creating index:', error);
+        log({
+            type: "error",
+            title : `Error creating resource index`,
+            message : `Error creating resource index`,
+            meta: {error}
+        }) 
+
     }
 }
 
@@ -187,6 +216,13 @@ async function searchResources(url) {
     } 
     catch (error) {
         console.error('Error searching documents:', error);
+        log({
+            type: "error",
+            title : `Error searching documents`,
+            message : `Error searching documents`,
+            meta: {error}
+        }) 
+
     }
 }
 
@@ -227,6 +263,13 @@ async function saveLastSyncResource(id, lastSync) {
     } 
     catch (error) {
         console.error('Error upserting document:', error);
+        log({
+            type: "error",
+            title : `Error upserting document`,
+            message : `Error upserting document`,
+            meta: {error}
+        }) 
+
     }
 }
 
@@ -255,6 +298,12 @@ async function getBulkData(rows) {
             return {_id : res.hits.hits[0]._id, sold : rows[idx].sold};
         }
         console.error(`No ID found for store: ${rows[idx].fk_store}, productBase: ${rows[idx].fk_product}`);
+        log({
+            type: "error",
+            title : `No ID found for store`,
+            message : `No ID found for store`,
+            meta: {store: rows[idx].fk_store, productBase: ows[idx].fk_product}
+        }) 
         return null;
     });
 
@@ -301,6 +350,13 @@ async function updateShopQuantities(rows) {
     } 
     catch (error) {
         console.error('Bulk update failed:', error);
+        log({
+            type: "error",
+            title : `Bulk update failed`,
+            message : `Bulk update failed`,
+            meta: {error}
+        }) 
+
     }
 }
 

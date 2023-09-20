@@ -3,6 +3,7 @@ const bq = require('./sources/bq');
 const {transformResponse} = require('./convertors/elastic');
 const EventEmitter = require('events');
 const importer = require("../AppUI/core/db")
+const {log} = require('./LogService');
 
 const CustomStrategyEmitter = require('./emitter');
 
@@ -43,6 +44,12 @@ class SyncManager extends EventEmitter {
             //const {rows, bridgeRows} = transformResponse(hits, mapping.mapping);
             if (searchResults.rows?.length > 0) {
                 console.log(`insert rows in ${mapping[mapping.target]}`);
+                log({
+                    type: "info",
+                    title : `insert rows in ${mapping[mapping.target]}`,
+                    message : `insert rows in ${mapping[mapping.target]}`,
+                    meta: {target : mapping[mapping.target], rows: searchResults.rows.slice(0,10)}
+                }) 
                 await TargetDataSources[mapping.target].insertRows(mapping[mapping.target], searchResults.rows);
 
                 await customEmitter.emit('rowsUpserted', {table: mapping[mapping.target], rows: searchResults.rows});
@@ -56,6 +63,13 @@ class SyncManager extends EventEmitter {
 
             if (!searchResults.rows?.length) {
                 console.log('No new data to sync');
+                log({
+                    type: "info",
+                    title : 'No new data to sync',
+                    message : 'No new data to sync',
+                    meta: {rows: {}}
+                }) 
+
                 return syncTimestamp;
             }
     
@@ -63,7 +77,13 @@ class SyncManager extends EventEmitter {
             syncTimestamp = searchResults.syncTimestamp;
             syncId = searchResults.syncId;
             console.log(`Synced ${searchResults.rows?.length} ${mapping[mapping.target]} rows`);
-        }
+            log({
+                type: "info",
+                title : `Synced ${searchResults.rows?.length} ${mapping[mapping.target]} rows`,
+                message : `Synced ${searchResults.rows?.length} ${mapping[mapping.target]} rows`,
+                meta: {target : mapping[mapping.target], firstRows: searchResults.rows.slice(0,10)}
+            }) 
+    }
     }
 
     getSyncInterval(latestTimestamp) {
@@ -82,6 +102,13 @@ class SyncManager extends EventEmitter {
             console.log('1 hour interval')
             interval = 60 * 60 * 1000;     // 1 hour
         }
+
+        log({
+            type: "info",
+            title : `current sync interval`,
+            message : `current sync interval`,
+            meta: {interval}
+        }) 
 
         console.log('1 second interval reset by should comment code');
         interval = 1 * 1000;
