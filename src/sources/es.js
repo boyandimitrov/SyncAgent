@@ -111,7 +111,12 @@ async function getLastSyncRecord(indexName, sync_trgt_col, sync_trgt_id_col) {
     return { syncId: null, syncTimestamp: null };
 }
 
+async function init () {
+
+}
+
 async function insertRows (indexName, rows) {
+    
     try {
         const body = rows.flatMap(row => [{ index: { _index: indexName } }, row]);
 
@@ -361,5 +366,5 @@ async function updateShopQuantities(rows) {
 }
 
 module.exports = {
-    search, createSchema, getLastSyncRecord, insertRows, updateShopQuantities, getLastSyncResource, saveLastSyncResource
+    init, search, createSchema, getLastSyncRecord, insertRows, updateShopQuantities, getLastSyncResource, saveLastSyncResource
 }

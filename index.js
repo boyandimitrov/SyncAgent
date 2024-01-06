@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const mapping = process.env.SYNC_MAPPING;
 
-const {target, mappings} = require(`./mappings/${mapping}.json`);
+const {source, target, mappings} = require(`./mappings/${mapping}.json`);
 
 const SyncManager = require('./src/sync');
 
@@ -18,6 +18,7 @@ async function updateSync() {
 }
 
 async function initSync() {
+    await syncManager.init(mappings, source);
     await syncManager.createSchema(mappings, target);
     console.log("Schema created");
 }

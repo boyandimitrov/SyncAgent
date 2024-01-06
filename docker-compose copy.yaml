@@ -1,28 +1,119 @@
-version: '3'
+version: '3.7'
 services:
-  elastic-firestore:
+
+#--------- promoto ------
+  promoto:
+    image: bioseek/promoto:1.0
+    ports:
+      - "3350:3350"
+    volumes:
+      - type: bind
+        source: ./_secrets/promoto/client.env
+        target: /usr/src/app/clinet/.env
+      - type: bind
+        source: ./_secrets/promoto/api.env
+        target: /usr/src/app/server/.env
+      - type: bind
+        source: ./_secrets/promoto/api.env.production
+        target: /usr/src/app/server/.env.production
+      - type: bind
+        source: ./_secrets/promoto/keys
+        target: /usr/src/app/keys
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./promoto
+      dockerfile: promoto.Dockerfile
+    command: npm start
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+  promoto_mailing:
+    image: bioseek/promoto:1.0
+    volumes:
+      - type: bind
+        source: ./_secrets/promoto/api.env
+        target: /usr/src/app/server/.env
+    build:
+      context: ./promoto
+      dockerfile: promoto.Dockerfile
+    working_dir: /usr/src/app/server/services/mailing
+    command: npm start
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+  promoto_file_generator:
+    image: bioseek/promoto:1.0
+    volumes:
+      - type: bind
+        source: ./_secrets/promoto/api.env
+        target: /usr/src/app/server/.env
+    build:
+      context: ./promoto
+      dockerfile: promoto.Dockerfile
+    working_dir: /usr/src/app/server/services/fileGenerator
+    command: npm start
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+  promoto_sync_es_to_fb:
+    image: bioseek/promoto-sync:1.0
+    volumes:
+      - type: bind
+        source: ./_secrets/promoto/promoto.sync.env
+        target: /usr/src/app/.env.production
+      - type: bind
+        source: ./_secrets/promoto/certs
+        target: /usr/src/app/certs
+    build:
+      context: ./promoto
+      dockerfile: promoto-sync.Dockerfile
     environment:
       - SYNC_MAPPING=es_to_fb
-    ports:
-      - "3001:3000" # Adjust the ports as needed
-
-  bq-sync:
+      - NODE_ENV=production
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    command: npm start
+  promoto_sync_fb_to_bq_quantities:
+    image: bioseek/promoto-sync:1.0
+    volumes:
+      - type: bind
+        source: ./_secrets/promoto/promoto.sync.env
+        target: /usr/src/app/.env.production
+      - type: bind
+        source: ./_secrets/promoto/certs
+        target: /usr/src/app/certs
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./promoto
+      dockerfile: promoto-sync.Dockerfile
     environment:
-      - SYNC_MAPPING=bq-sync
-    ports:
-      - "3002:3000" # Adjust the ports as needed
-
-  firestone-sync:
+      - SYNC_MAPPING=fb_to_bq_quantities
+      - NODE_ENV=production
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    command: npm start
+  promoto_sync_bq_to_es_quantities:
+    image: bioseek/promoto-sync:1.0
+    volumes:
+      - type: bind
+        source: ./_secrets/promoto/promoto.sync.env
+        target: /usr/src/app/.env.production
+      - type: bind
+        source: ./_secrets/promoto/certs
+        target: /usr/src/app/certs
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./promoto
+      dockerfile: promoto-sync.Dockerfile
     environment:
-      - SYNC_MAPPING=firestone-sync
-    ports:
-      - "3003:3000" # Adjust the ports as needed
+      - NODE_ENV=production
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "10"
+    command: npm run start:trans
+#--------- promoto ------

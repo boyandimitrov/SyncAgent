@@ -1,11 +1,11 @@
 const Sentry = require('@sentry/node');
-const { ProfilingIntegration } = require("@sentry/profiling-node");
+//const { ProfilingIntegration } = require("@sentry/profiling-node");
 
 Sentry.init({
     dsn: process.env.SENTRY_DSN,
-    integrations: [
-        new ProfilingIntegration(),
-    ],
+    // integrations: [
+    //     new ProfilingIntegration(),
+    // ],
     // Performance Monitoring
     tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE, // Capture 100% of the transactions, reduce in production!
     // Set sampling rate for profiling - this is relative to tracesSampleRate

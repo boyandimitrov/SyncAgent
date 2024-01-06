@@ -63,6 +63,10 @@ async function _search(mapping, latestTimestamp, latestId) {
     return rows;
 }
 
+async function init () {
+
+}
+
 async function search(mapping, latestTimestamp, latestId) {
     const docs = await _search(mapping, latestTimestamp, latestId);
 
@@ -191,5 +195,5 @@ async function insertRows(collectionName, rows) {
 }
 
 module.exports = {
-    search, createSchema, getLastSyncRecord, insertRows
+    init, search, createSchema, getLastSyncRecord, insertRows
 }

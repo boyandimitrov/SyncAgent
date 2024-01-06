@@ -135,6 +135,10 @@ class SyncManager extends EventEmitter {
         });
     }
 
+    async init(mappings, source) {
+        await SourceDataSources[source].init(mappings);
+    }
+
     async createSchema(mappings, target) {
         await TargetDataSources[target].createSchema(mappings);
     }
