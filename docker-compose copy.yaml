@@ -90,7 +90,7 @@ services:
       context: ./promoto
       dockerfile: promoto-sync.Dockerfile
     environment:
-      - SYNC_MAPPING=fb_to_bq_quantities
+      - SYNC_MAPPING=fb_to_bq
       - NODE_ENV=production
     logging:
       options:

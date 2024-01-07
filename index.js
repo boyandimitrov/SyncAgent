@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const mapping = process.env.SYNC_MAPPING;
 
+console.log("environment", process.env);
+
 const {source, target, mappings} = require(`./mappings/${mapping}.json`);
 
 const SyncManager = require('./src/sync');
